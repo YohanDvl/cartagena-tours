@@ -1,0 +1,47 @@
+{
+  "id": "8",
+  "title": "City Tour: Castillo & La Popa",
+  "shortDescription": "Explora la fortaleza más grande de América y obtén la mejor vista de la ciudad.",
+  "fullDescription": "Un recorrido esencial por los íconos de Cartagena. Visitaremos el Convento de la Popa en el punto más alto de la ciudad y exploraremos los túneles y murallas del Castillo de San Felipe de Barajas, la obra de ingeniería militar más importante de España en el nuevo mundo.",
+  "price": 130000,
+  "duration": "4 horas",
+  "rating": 4.8,
+  "reviews": 428,
+  "images": [
+    "/images/downloads/IMG_7109.HEIC",
+    "/images/downloads/IMG_8129.HEIC"
+  ],
+  "category": "Cultura & Historia",
+  "includes": [
+    "Transporte climatizado",
+    "Entradas a San Felipe y La Popa",
+    "Guía profesional historiador",
+    "Hidratación"
+  ],
+  "notIncludes": [
+    "Comidas",
+    "Propinas"
+  ],
+  "itinerary": [
+    {
+      "time": "02:00 PM",
+      "description": "Recogida e inicio del tour."
+    },
+    {
+      "time": "02:30 PM",
+      "description": "Visita al Convento de la Popa."
+    },
+    {
+      "time": "03:30 PM",
+      "description": "Recorrido por el Castillo San Felipe."
+    },
+    {
+      "time": "05:00 PM",
+      "description": "Parada en los Zapatos Viejos y Monumento a la India Catalina."
+    },
+    {
+      "time": "06:00 PM",
+      "description": "Regreso al hotel."
+    }
+  ]
+}

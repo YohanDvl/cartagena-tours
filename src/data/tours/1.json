@@ -1,0 +1,49 @@
+{
+  "id": "1",
+  "title": "Día de Lujo en Islas del Rosario",
+  "shortDescription": "Escápate a aguas cristalinas y playas de arena blanca en un tour en yate exclusivo por el archipiélago.",
+  "fullDescription": "Disfruta de un día inolvidable navegando por las hermosas Islas del Rosario. Nuestro yate de lujo te llevará a los rincones más exclusivos del archipiélago, donde podrás hacer snorkel en arrecifes de coral vibrantes y relajarte en un club de playa privado. Incluye almuerzo típico caribeño y cóctel de bienvenida.",
+  "price": 850000,
+  "duration": "8 horas",
+  "rating": 4.9,
+  "reviews": 124,
+  "images": [
+    "/images/downloads/IMG_1934.JPG.jpeg",
+    "/images/downloads/IMG_1935.JPG.jpeg"
+  ],
+  "category": "Playa & Mar",
+  "includes": [
+    "Transporte en yate deportivo",
+    "Cóctel de bienvenida",
+    "Almuerzo típico (Pescado frito, arroz con coco)",
+    "Equipo de snorkel",
+    "Seguro de viaje"
+  ],
+  "notIncludes": [
+    "Impuesto de muelle (Aprox. $25,000 COP)",
+    "Bebidas alcohólicas adicionales",
+    "Propinas"
+  ],
+  "itinerary": [
+    {
+      "time": "08:00 AM",
+      "description": "Encuentro en el Muelle de la Bodeguita."
+    },
+    {
+      "time": "09:00 AM",
+      "description": "Llegada a las Islas del Rosario y tour panorámico."
+    },
+    {
+      "time": "11:00 AM",
+      "description": "Tiempo de Snorkel en los arrecifes."
+    },
+    {
+      "time": "01:00 PM",
+      "description": "Almuerzo en Club de Playa Privado."
+    },
+    {
+      "time": "04:00 PM",
+      "description": "Regreso a Cartagena disfrutando del atardecer."
+    }
+  ]
+}

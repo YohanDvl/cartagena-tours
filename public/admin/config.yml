@@ -1,0 +1,41 @@
+local_backend: true
+backend:
+  name: git-gateway
+  branch: main # Ensure this matches your default branch
+
+media_folder: "public/images"
+public_folder: "/images"
+
+collections:
+  - name: "tours"
+    label: "Tours"
+    folder: "src/data/tours"
+    create: true
+    slug: "{{id}}"
+    extension: "json"
+    format: "json"
+    fields:
+      - { label: "ID único", name: "id", widget: "string" }
+      - { label: "Título del Tour", name: "title", widget: "string" }
+      - { label: "Categoría", name: "category", widget: "select", options: ["Playa & Mar", "Cultura & Historia", "Vida Nocturna", "Naturaleza & Relax"] }
+      - { label: "Descripción Corta", name: "shortDescription", widget: "string" }
+      - { label: "Descripción Completa", name: "fullDescription", widget: "text" }
+      - { label: "Precio (COP)", name: "price", widget: "number", value_type: "int" }
+      - { label: "Duración", name: "duration", widget: "string", hint: "Ej: 8 horas" }
+      - { label: "Calificación", name: "rating", widget: "number", value_type: "float", min: 1, max: 5 }
+      - { label: "Número de Reseñas", name: "reviews", widget: "number", value_type: "int" }
+      - { label: "Imagen", name: "image", widget: "image" }
+      - label: "Incluye"
+        name: "includes"
+        widget: "list"
+        field: { label: "Item", name: "item", widget: "string" }
+      - label: "No Incluye"
+        name: "notIncludes"
+        widget: "list"
+        field: { label: "Item", name: "item", widget: "string" }
+      - label: "Itinerario"
+        name: "itinerary"
+        widget: "list"
+        fields:
+          - { label: "Hora", name: "time", widget: "string" }
+          - { label: "Descripción", name: "description", widget: "string" }

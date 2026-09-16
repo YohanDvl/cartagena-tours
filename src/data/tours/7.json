@@ -1,0 +1,48 @@
+{
+  "id": "7",
+  "title": "Aviario Nacional de Colombia",
+  "shortDescription": "Visita el aviario más grande de América Latina y maravíllate con la biodiversidad.",
+  "fullDescription": "Una experiencia inmersiva en la naturaleza donde podrás ver más de 170 especies de aves en hábitats que recrean selvas, desiertos y costas. Desde el majestuoso Cóndor de los Andes hasta flamencos y tucanes vibrantes.",
+  "price": 180000,
+  "duration": "5 horas",
+  "rating": 4.7,
+  "reviews": 112,
+  "images": [
+    "/images/downloads/IMG_6923.JPG.jpeg",
+    "/images/downloads/IMG_6924.JPG.jpeg"
+  ],
+  "category": "Naturaleza & Relax",
+  "includes": [
+    "Transporte ida y vuelta",
+    "Entrada al Aviario",
+    "Guía acompañante",
+    "Agua embotellada"
+  ],
+  "notIncludes": [
+    "Almuerzo",
+    "Gastos personales",
+    "Propinas"
+  ],
+  "itinerary": [
+    {
+      "time": "08:30 AM",
+      "description": "Recogida en el hotel."
+    },
+    {
+      "time": "09:30 AM",
+      "description": "Llegada al Aviario (Isla Barú)."
+    },
+    {
+      "time": "10:00 AM",
+      "description": "Recorrido por los 3 ecosistemas."
+    },
+    {
+      "time": "12:00 PM",
+      "description": "Presentación \"Aves al Vuelo\"."
+    },
+    {
+      "time": "01:30 PM",
+      "description": "Regreso a Cartagena."
+    }
+  ]
+}

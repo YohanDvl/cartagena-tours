@@ -1,0 +1,64 @@
+[
+  {
+    "title": "City Tour Cultural",
+    "shortDescription": "Recorrido guiado por los principales puntos de interés cultural e histórico de Cartagena.",
+    "fullDescription": "Recorrido guiado por los principales puntos de interés cultural e histórico de Cartagena. El tour incluye visitas a monumentos, plazas y sitios emblemáticos.",
+    "price": 0,
+    "duration": "Aproximadamente 4 horas",
+    "includes": ["Guía turístico profesional y bilingüe", "Entrada al Castillo de San Felipe de Barajas", "Tour en chiva turística y cultural", "Recogida y retorno en el hotel (Áreas de Bocagrande y Laguito)"],
+    "itinerary": [
+      {"time": "Inicio", "activity": "Bahía de Cartagena"},
+      {"time": "Punto", "activity": "Torre del Reloj Getsemaní"},
+      {"time": "Punto", "activity": "Fuerte Sebastián de Pastelillo"},
+      {"time": "Punto", "activity": "Castillo de San Felipe"},
+      {"time": "Punto", "activity": "Monumento a los Zapatos Viejos"},
+      {"time": "Punto", "activity": "Letras de CARTAGENA"},
+      {"time": "Fin", "activity": "Caminata por el centro histórico"}
+    ],
+    "category": "Cultural"
+  },
+  {
+    "title": "Night Party Boat",
+    "shortDescription": "Recorrido inolvidable por la bahía de Cartagena con música, entretenimiento y ambiente festivo.",
+    "fullDescription": "Disfruta de un recorrido inolvidable por la bahía de Cartagena, con vistas espectaculares y una experiencia llena de música, entretenimiento y ambiente festivo a bordo. Visita panorámica a los puntos más emblemáticos: Virgen del Agua, Castillo Grande, Bocagrande, Manga, Parte de Tierra Bomba.",
+    "price": 0,
+    "duration": "2 horas",
+    "includes": ["Bote deportivo de lujo con cojines de cuero", "Full música y animación a bordo", "Barra libre: Ron, agua, Coca-Cola, entre otros", "Ingreso a discoteca Taboo al finalizar el recorrido"],
+    "itinerary": [],
+    "category": "Fiesta"
+  },
+  {
+    "title": "Parque Tayrona Cabo San Juan",
+    "shortDescription": "Recorrido ecológico con caminata de dos horas hasta el Cabo San Juan observando siete playas.",
+    "fullDescription": "Recorrido ecológico con una caminata de aproximadamente dos horas hasta el Cabo San Juan. Durante el trayecto se observan siete playas, incluyendo Piscinita, San Felipe, La Gumarra, Arrecifes, Arenilla y Piscina Natural. El regreso se realiza por el mismo sendero.",
+    "price": 0,
+    "duration": "Día completo",
+    "includes": ["Transporte terrestre climatizado (1 hora aproximada)", "Entrada al Parque Nacional Tayrona", "Seguro médico", "Guía profesional"],
+    "itinerary": [],
+    "category": "Naturaleza"
+  },
+  {
+    "title": "Playa Blanca Santa Marta",
+    "shortDescription": "Visita a Playa Blanca con transporte, almuerzo típico y entrada al acuario.",
+    "fullDescription": "Visita a Playa Blanca con transporte, almuerzo típico y entrada al acuario. Un recorrido que incluye guía profesional y seguro de viaje para mayor tranquilidad.",
+    "price": 0,
+    "duration": "Día completo",
+    "includes": ["Almuerzo típico de la región", "Transporte terrestre hasta Playa Blanca", "Entrada al acuario (especies marinas y show de delfines)", "Seguro de viaje", "Guía turístico profesional"],
+    "itinerary": [],
+    "category": "Playa"
+  },
+  {
+    "title": "Playas Tayrona Cinto y Playa Cristal",
+    "shortDescription": "Explora dos de las playas más hermosas del Parque Nacional Tayrona en un solo día.",
+    "fullDescription": "Explora dos de las playas más hermosas del Parque Nacional Tayrona en un solo día. Disfruta de medio día en Cinto y el otro en Playa Cristal, rodeado de naturaleza y aguas cristalinas.",
+    "price": 0,
+    "duration": "Día completo",
+    "includes": ["Entradas al Parque Nacional Tayrona", "Transporte marítimo desde el muelle norte del Rodadero", "Seguro de asistencia", "Guía profesional durante todo el recorrido"],
+    "itinerary": [
+      {"time": "8:45 AM", "activity": "Salida desde el muelle norte del Rodadero"},
+      {"time": "Medio día", "activity": "Playa Cinto"},
+      {"time": "Medio día", "activity": "Playa Cristal"}
+    ],
+    "category": "Playa"
+  }
+]

@@ -1,0 +1,44 @@
+{
+  "id": "3",
+  "title": "Chiva Rumbera Nocturna",
+  "shortDescription": "La fiesta tradicional sobre ruedas. Música en vivo, licor nacional y diversión garantizada.",
+  "fullDescription": "Vive la noche cartagenera a bordo de una colorida Chiva (autobús tradicional). Recorre las zonas turísticas de Bocagrande, Castillo Grande y la Torre del Reloj mientras disfrutas de música vallenata en vivo, animación, y barra libre de licor nacional. ¡La mejor manera de empezar la rumba!",
+  "price": 75000,
+  "duration": "4 horas",
+  "rating": 4.6,
+  "reviews": 342,
+  "images": [
+    "/images/downloads/IMG_1938.JPG.jpeg",
+    "/images/downloads/IMG_4956.JPG.jpeg"
+  ],
+  "category": "Vida Nocturna",
+  "includes": [
+    "Recorrido en Chiva tradicional",
+    "Música en vivo",
+    "Animador profesional",
+    "Barra libre de licor nacional (Ron/Aguardiente)",
+    "Entrada a discoteca (opcional)"
+  ],
+  "notIncludes": [
+    "Comida",
+    "Licores premium"
+  ],
+  "itinerary": [
+    {
+      "time": "08:00 PM",
+      "description": "Recogida en hoteles de Bocagrande/Laguito."
+    },
+    {
+      "time": "09:00 PM",
+      "description": "Inicio del recorrido por la bahía y zona moderna."
+    },
+    {
+      "time": "10:30 PM",
+      "description": "Parada en los zapatos viejos y Torre del Reloj."
+    },
+    {
+      "time": "12:00 AM",
+      "description": "Fin del tour en discoteca de Getsemaní."
+    }
+  ]
+}

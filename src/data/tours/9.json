@@ -1,0 +1,49 @@
+{
+  "id": "9",
+  "title": "Aventura en los Manglares",
+  "shortDescription": "Navega en canoa tradicional por los túneles naturales de manglar en la Ciénaga de la Virgen.",
+  "fullDescription": "Sumérgete en un ecosistema único y vital. Acompañado por pescadores locales de la comunidad de Juan Polo, recorrerás en canoa los \"túneles del amor\" y otros senderos acuáticos entre manglares. Aprenderás sobre la fauna local, técnicas de pesca artesanal y la importancia de la conservación de este pulmón verde de Cartagena.",
+  "price": 110000,
+  "duration": "3 horas",
+  "rating": 4.9,
+  "reviews": 42,
+  "images": [
+    "/images/downloads/IMG_9523.HEIC",
+    "/images/downloads/IMG_9529.HEIC"
+  ],
+  "category": "Naturaleza & Relax",
+  "includes": [
+    "Transporte en canoa tradicional",
+    "Guía nativo de la comunidad",
+    "Charla sobre ecosistema de manglar",
+    "Degustación de frito típico local",
+    "Hidratación"
+  ],
+  "notIncludes": [
+    "Transporte al punto de inicio (La Boquilla)",
+    "Gastos personales",
+    "Propinas"
+  ],
+  "itinerary": [
+    {
+      "time": "08:00 AM",
+      "description": "Encuentro en La Boquilla."
+    },
+    {
+      "time": "08:30 AM",
+      "description": "Inicio del recorrido por los túneles de manglar."
+    },
+    {
+      "time": "10:00 AM",
+      "description": "Demostración de pesca artesanal."
+    },
+    {
+      "time": "10:30 AM",
+      "description": "Refrigerio típico en la playa."
+    },
+    {
+      "time": "11:00 AM",
+      "description": "Fin de la experiencia."
+    }
+  ]
+}

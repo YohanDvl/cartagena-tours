@@ -1,0 +1,48 @@
+{
+  "id": "6",
+  "title": "San Basilio de Palenque",
+  "shortDescription": "Conoce el primer pueblo libre de América y su rica herencia africana.",
+  "fullDescription": "Viaja en el tiempo en esta experiencia cultural única. San Basilio de Palenque es Patrimonio de la Humanidad por la UNESCO. Conocerás su lengua propia, sus rituales musicales, la medicina tradicional y la historia de libertad liderada por Benkos Biohó.",
+  "price": 250000,
+  "duration": "6 horas",
+  "rating": 5,
+  "reviews": 54,
+  "images": [
+    "/images/downloads/IMG_6186.JPG.jpeg",
+    "/images/downloads/IMG_6187.JPG.jpeg"
+  ],
+  "category": "Cultura & Historia",
+  "includes": [
+    "Transporte privado ida y vuelta",
+    "Guía nativo experto",
+    "Almuerzo tradicional en el pueblo",
+    "Taller de música o danza tradicional"
+  ],
+  "notIncludes": [
+    "Bebidas adicionales",
+    "Artesanías",
+    "Propinas"
+  ],
+  "itinerary": [
+    {
+      "time": "08:00 AM",
+      "description": "Salida desde Cartagena."
+    },
+    {
+      "time": "09:30 AM",
+      "description": "Llegada y caminata histórica por el pueblo."
+    },
+    {
+      "time": "11:00 AM",
+      "description": "Encuentro con sabedores locales (Música/Medicina)."
+    },
+    {
+      "time": "01:00 PM",
+      "description": "Almuerzo típico palenquero."
+    },
+    {
+      "time": "03:00 PM",
+      "description": "Regreso a Cartagena."
+    }
+  ]
+}

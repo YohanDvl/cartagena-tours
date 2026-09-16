@@ -1,0 +1,46 @@
+{
+  "id": "4",
+  "title": "Baño de Lodo en Volcán del Totumo",
+  "shortDescription": "Relájate en las cálidas y curativas aguas de lodo de este singular cráter volcánico.",
+  "fullDescription": "Un viaje corto desde Cartagena te lleva al Volcán del Totumo, un pequeño volcán famoso por su espeso cráter de lodo cálido y rico en minerales. Sube las escaleras de madera, sumérgete en el lodo (¡flotarás mágicamente!) y luego recibe un lavado tradicional en la laguna cercana por parte de las mujeres locales.",
+  "price": 120000,
+  "duration": "5 horas",
+  "rating": 4.4,
+  "reviews": 89,
+  "images": [
+    "/images/downloads/IMG_5008.PNG",
+    "/images/downloads/IMG_5010.PNG"
+  ],
+  "category": "Naturaleza & Relax",
+  "includes": [
+    "Transporte ida y regreso",
+    "Entrada al Volcán",
+    "Almuerzo tradicional"
+  ],
+  "notIncludes": [
+    "Propinas para masajistas y lavadoras en el lodo (Aprox. $5,000 COP c/u)",
+    "Bebidas"
+  ],
+  "itinerary": [
+    {
+      "time": "08:00 AM",
+      "description": "Salida desde Cartagena."
+    },
+    {
+      "time": "09:30 AM",
+      "description": "Llegada al Volcán y baño de lodo."
+    },
+    {
+      "time": "10:30 AM",
+      "description": "Lavado en la laguna."
+    },
+    {
+      "time": "11:30 AM",
+      "description": "Almuerzo en Manzanillo del Mar."
+    },
+    {
+      "time": "01:00 PM",
+      "description": "Regreso a Cartagena."
+    }
+  ]
+}

@@ -1,0 +1,44 @@
+{
+  "id": "5",
+  "title": "Atardecer en Catamarán",
+  "shortDescription": "Navega por la bahía de Cartagena mientras el sol se oculta en el horizonte caribeño.",
+  "fullDescription": "Disfruta de la mejor vista del skyline de Cartagena desde el mar. Nuestro catamarán de lujo te llevará en un recorrido relajante con música chill-out, barra libre de cócteles nacionales y snacks. El momento perfecto para fotos inolvidables.",
+  "price": 150000,
+  "duration": "2 horas",
+  "rating": 4.9,
+  "reviews": 86,
+  "images": [
+    "/images/downloads/IMG_5011.PNG",
+    "/images/downloads/IMG_5687.JPG.jpeg"
+  ],
+  "category": "Playa & Mar",
+  "includes": [
+    "Recorrido por la bahía",
+    "Barra libre (Cócteles, cerveza, refrescos)",
+    "Snacks ligeros",
+    "DJ a bordo"
+  ],
+  "notIncludes": [
+    "Transporte al muelle",
+    "Cena",
+    "Propinas"
+  ],
+  "itinerary": [
+    {
+      "time": "04:30 PM",
+      "description": "Encuentro en el Muelle de la Bodeguita."
+    },
+    {
+      "time": "05:00 PM",
+      "description": "Zarpe y navegación por la bahía."
+    },
+    {
+      "time": "06:00 PM",
+      "description": "Momento del atardecer y fotos."
+    },
+    {
+      "time": "07:00 PM",
+      "description": "Regreso al muelle."
+    }
+  ]
+}

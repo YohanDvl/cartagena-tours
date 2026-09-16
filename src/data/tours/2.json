@@ -1,0 +1,43 @@
+{
+  "id": "2",
+  "title": "Walking Tour: Ciudad Amurallada",
+  "shortDescription": "Descubre los secretos, leyendas y la arquitectura vibrante del centro histórico de Cartagena.",
+  "fullDescription": "Camina por las pintorescas calles empedradas de la Ciudad Amurallada con un guía experto local. Descubre la rica historia de piratas, inquisición y la independencia de Colombia mientras admiras los balcones coloridos, las plazas históricas y las majestuosas iglesias.",
+  "price": 90000,
+  "duration": "3 horas",
+  "rating": 4.8,
+  "reviews": 215,
+  "images": [
+    "/images/downloads/IMG_1936.JPG.jpeg",
+    "/images/downloads/IMG_1937.JPG.jpeg"
+  ],
+  "category": "Cultura & Historia",
+  "includes": [
+    "Guía bilingüe certificado",
+    "Botella de agua",
+    "Degustación de dulce típico callejero"
+  ],
+  "notIncludes": [
+    "Transporte al punto de encuentro",
+    "Entradas a museos",
+    "Propinas"
+  ],
+  "itinerary": [
+    {
+      "time": "04:00 PM",
+      "description": "Encuentro en la Torre del Reloj."
+    },
+    {
+      "time": "04:30 PM",
+      "description": "Recorrido por la Plaza de la Aduana y San Pedro Claver."
+    },
+    {
+      "time": "05:30 PM",
+      "description": "Paseo por las murallas."
+    },
+    {
+      "time": "06:30 PM",
+      "description": "Finalización en la Plaza Santo Domingo."
+    }
+  ]
+}
