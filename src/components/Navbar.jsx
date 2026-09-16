@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Menu, X, Shield } from 'lucide-react';
+import { Menu, X } from 'lucide-react';
 import { getImageUrl } from '../utils/imageUrl';
 
 export default function Navbar() {
@@ -134,25 +134,7 @@ export default function Navbar() {
             Nosotros
           </a>
 
-          <Link 
-            to="/admin" 
-            className="btn"
-            style={{
-              padding: '0.5rem 1rem',
-              fontSize: '0.85rem',
-              fontWeight: 700,
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.4rem',
-              backgroundColor: isScrolled ? 'var(--surface)' : 'rgba(255,255,255,0.15)',
-              color: isScrolled ? 'var(--text-main)' : '#fff',
-              border: '1px solid rgba(255,255,255,0.25)',
-              borderRadius: 'var(--radius-full)'
-            }}
-          >
-            <Shield size={15} color="var(--primary)" />
-            Panel Admin
-          </Link>
+          
 
           <a 
             href="https://wa.me/573009446681?text=Hola!%20Quiero%20informaci%C3%B3n%20sobre%20los%20tours%20en%20Cartagena"
@@ -191,9 +173,7 @@ export default function Navbar() {
           <a href="#tours" onClick={(e) => handleNavClick(e, 'tours')} style={{ color: 'var(--text-main)', fontWeight: 600, fontSize: '1.1rem' }}>Tours & Botes</a>
           <a href="#apartments" onClick={(e) => handleNavClick(e, 'apartments')} style={{ color: 'var(--text-main)', fontWeight: 600, fontSize: '1.1rem' }}>Apartamentos</a>
           <a href="#about" onClick={(e) => handleNavClick(e, 'about')} style={{ color: 'var(--text-main)', fontWeight: 600, fontSize: '1.1rem' }}>Nosotros</a>
-          <Link to="/admin" onClick={() => setIsMobileMenuOpen(false)} style={{ color: 'var(--primary)', fontWeight: 700, fontSize: '1.1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            <Shield size={18} /> Panel de Administración
-          </Link>
+          
           <a 
             href="https://wa.me/573009446681" 
             target="_blank" 

@@ -1,4 +1,4 @@
-import { MapPin, Phone, Shield } from 'lucide-react';
+import { MapPin, Phone } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { getImageUrl } from '../utils/imageUrl';
 
@@ -40,11 +40,7 @@ export default function Footer() {
             <li><a href="#tours" style={{ color: 'var(--text-muted)' }} className="hover-primary">Nuestros Tours & Botes</a></li>
             <li><a href="#apartments" style={{ color: 'var(--text-muted)' }} className="hover-primary">Apartamentos Turísticos</a></li>
             <li><a href="#about" style={{ color: 'var(--text-muted)' }} className="hover-primary">Sobre YouTours</a></li>
-            <li>
-              <Link to="/admin" style={{ color: 'var(--primary)', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: '0.3rem' }} className="hover-primary">
-                <Shield size={16} /> Panel de Administración
-              </Link>
-            </li>
+            
           </ul>
         </div>
 

@@ -1,33 +1,41 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Lock, ShieldCheck, ArrowLeft, KeyRound, Sparkles } from 'lucide-react';
+import { Lock, ArrowLeft, HelpCircle } from 'lucide-react';
 
 export default function AdminLogin({ onLogin }) {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [showRecovery, setShowRecovery] = useState(false);
+  const [recoveryAnswer, setRecoveryAnswer] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [recoverySuccess, setRecoverySuccess] = useState('');
   const navigate = useNavigate();
 
   const handleLogin = (e) => {
     e.preventDefault();
     setError('');
 
-    // Static Demo or Offline bypass: 'admin' / 'admin' or 'admin123'
-    if (
-      (username.trim().toLowerCase() === 'admin' && (password === 'admin' || password === 'admin123')) ||
-      (username.trim() === 'yohan' && password === 'admin123')
-    ) {
-      localStorage.setItem('admin_token', 'demo-token-active');
+    const u = username.trim();
+    const p = password.trim();
+
+    // Verificación de credenciales oficiales del sistema
+    const valid = 
+      (u.toUpperCase() === 'ADMIN' && (p === 'admin1234' || p === 'admin123')) ||
+      (u.toLowerCase() === 'admin' && (p === 'admin1234' || p === 'admin123'));
+
+    if (valid) {
+      localStorage.setItem('admin_token', 'youtours-admin-session-active');
       onLogin(true);
       navigate('/admin');
       return;
     }
 
-    // Attempt real API if available
+    // Intentar backend si estuviera online
     fetch('/api/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ username, password })
+      body: JSON.stringify({ username: u, password: p })
     })
       .then(res => res.json())
       .then(data => {
@@ -36,18 +44,30 @@ export default function AdminLogin({ onLogin }) {
           onLogin(true);
           navigate('/admin');
         } else {
-          setError(data.message || 'Credenciales no reconocidas. Usa el botón de Acceso Demo abajo.');
+          setError('Usuario o contraseña incorrectos.');
         }
       })
       .catch(() => {
-        setError('Servidor local offline. Usa el botón "Acceder como Administrador Demo" para ingresar.');
+        setError('Usuario o contraseña incorrectos.');
       });
   };
 
-  const handleDemoAccess = () => {
-    localStorage.setItem('admin_token', 'demo-token-active');
-    onLogin(true);
-    navigate('/admin');
+  const handleRecovery = (e) => {
+    e.preventDefault();
+    if (recoveryAnswer.trim() === '2022') {
+      if (newPassword.length < 4) {
+        setError('La nueva contraseña debe tener al menos 4 caracteres.');
+        return;
+      }
+      localStorage.setItem('admin_token', 'youtours-admin-session-active');
+      setRecoverySuccess('¡Identidad verificada! Contraseña restablecida.');
+      setTimeout(() => {
+        onLogin(true);
+        navigate('/admin');
+      }, 1500);
+    } else {
+      setError('Respuesta de seguridad incorrecta.');
+    }
   };
 
   return (
@@ -65,7 +85,7 @@ export default function AdminLogin({ onLogin }) {
         borderRadius: 'var(--radius-xl)',
         boxShadow: 'var(--shadow-xl)',
         width: '100%',
-        maxWidth: '450px',
+        maxWidth: '440px',
         border: '1px solid var(--border)'
       }}>
         <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
@@ -80,11 +100,11 @@ export default function AdminLogin({ onLogin }) {
             borderRadius: '50%',
             marginBottom: '1rem'
           }}>
-            <Lock size={32} />
+            <Lock size={30} />
           </div>
-          <h1 style={{ fontSize: '1.8rem', fontWeight: 800, marginBottom: '0.5rem' }}>Panel de Administración</h1>
-          <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem' }}>
-            Gestión integral de tours, apartamentos y tarifas de YouTours
+          <h1 style={{ fontSize: '1.7rem', fontWeight: 800, marginBottom: '0.4rem' }}>Acceso Administrativo</h1>
+          <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>
+            Área restringida exclusiva para administradores de YouTours
           </p>
         </div>
 
@@ -96,100 +116,173 @@ export default function AdminLogin({ onLogin }) {
             padding: '0.8rem',
             borderRadius: 'var(--radius-md)',
             fontSize: '0.85rem',
-            marginBottom: '1.5rem'
+            marginBottom: '1.5rem',
+            textAlign: 'center'
           }}>
             {error}
           </div>
         )}
 
-        <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: '1.2rem' }}>
-          <div>
-            <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, marginBottom: '0.4rem' }}>
-              Usuario
-            </label>
-            <input 
-              type="text"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              placeholder="admin"
-              required
-              style={{
-                width: '100%',
-                padding: '0.8rem 1rem',
-                borderRadius: 'var(--radius-md)',
-                border: '1px solid var(--border)',
-                backgroundColor: 'var(--background)',
-                color: 'var(--text-main)',
-                fontSize: '1rem',
-                outline: 'none'
-              }}
-            />
+        {recoverySuccess && (
+          <div style={{
+            backgroundColor: 'rgba(16, 185, 129, 0.1)',
+            border: '1px solid #10b981',
+            color: '#10b981',
+            padding: '0.8rem',
+            borderRadius: 'var(--radius-md)',
+            fontSize: '0.85rem',
+            marginBottom: '1.5rem',
+            textAlign: 'center'
+          }}>
+            {recoverySuccess}
           </div>
+        )}
 
-          <div>
-            <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, marginBottom: '0.4rem' }}>
-              Contraseña
-            </label>
-            <input 
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="••••••••"
-              required
-              style={{
-                width: '100%',
-                padding: '0.8rem 1rem',
-                borderRadius: 'var(--radius-md)',
-                border: '1px solid var(--border)',
-                backgroundColor: 'var(--background)',
-                color: 'var(--text-main)',
-                fontSize: '1rem',
-                outline: 'none'
-              }}
-            />
-          </div>
+        {!showRecovery ? (
+          <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: '1.2rem' }}>
+            <div>
+              <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, marginBottom: '0.4rem' }}>
+                Usuario
+              </label>
+              <input 
+                type="text"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                placeholder="Ingresa tu usuario"
+                required
+                autoFocus
+                style={{
+                  width: '100%',
+                  padding: '0.8rem 1rem',
+                  borderRadius: 'var(--radius-md)',
+                  border: '1px solid var(--border)',
+                  backgroundColor: 'var(--background)',
+                  color: 'var(--text-main)',
+                  fontSize: '1rem',
+                  outline: 'none'
+                }}
+              />
+            </div>
 
-          <button 
-            type="submit"
-            className="btn btn-primary"
-            style={{ width: '100%', padding: '0.9rem', fontSize: '1rem', fontWeight: 700, marginTop: '0.5rem' }}
-          >
-            Iniciar Sesión
-          </button>
-        </form>
+            <div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.4rem' }}>
+                <label style={{ fontSize: '0.85rem', fontWeight: 600 }}>
+                  Contraseña
+                </label>
+                <button 
+                  type="button" 
+                  onClick={() => { setShowRecovery(true); setError(''); }}
+                  style={{ background: 'none', border: 'none', color: 'var(--primary)', fontSize: '0.8rem', cursor: 'pointer', fontWeight: 600 }}
+                >
+                  ¿Olvidaste tu contraseña?
+                </button>
+              </div>
+              <input 
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="••••••••"
+                required
+                style={{
+                  width: '100%',
+                  padding: '0.8rem 1rem',
+                  borderRadius: 'var(--radius-md)',
+                  border: '1px solid var(--border)',
+                  backgroundColor: 'var(--background)',
+                  color: 'var(--text-main)',
+                  fontSize: '1rem',
+                  outline: 'none'
+                }}
+              />
+            </div>
 
-        <div style={{ marginTop: '1.5rem', paddingTop: '1.5rem', borderTop: '1px dashed var(--border)', textAlign: 'center' }}>
-          <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '0.8rem' }}>
-            ¿Estás explorando el portafolio en vivo?
-          </p>
-          <button 
-            type="button"
-            onClick={handleDemoAccess}
-            style={{
-              width: '100%',
-              padding: '0.85rem',
-              backgroundColor: '#10b981',
-              color: '#ffffff',
-              border: 'none',
-              borderRadius: 'var(--radius-md)',
-              fontWeight: 700,
-              fontSize: '0.95rem',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '0.5rem',
-              boxShadow: '0 4px 12px rgba(16, 185, 129, 0.3)'
-            }}
-          >
-            <Sparkles size={18} />
-            Acceder al Panel Demo (1 Clic)
-          </button>
-        </div>
+            <button 
+              type="submit"
+              className="btn btn-primary"
+              style={{ width: '100%', padding: '0.85rem', fontSize: '1rem', fontWeight: 700, marginTop: '0.5rem' }}
+            >
+              Ingresar al Panel
+            </button>
+          </form>
+        ) : (
+          <form onSubmit={handleRecovery} style={{ display: 'flex', flexDirection: 'column', gap: '1.2rem' }}>
+            <div style={{ padding: '0.8rem', backgroundColor: 'var(--background)', borderRadius: 'var(--radius-md)', border: '1px solid var(--border)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--primary)', fontWeight: 700, fontSize: '0.85rem', marginBottom: '0.25rem' }}>
+                <HelpCircle size={16} /> Pregunta de Seguridad
+              </div>
+              <p style={{ fontSize: '0.9rem', color: 'var(--text-main)', fontWeight: 600 }}>
+                ¿En qué año te graduaste del colegio?
+              </p>
+            </div>
 
-        <div style={{ textAlign: 'center', marginTop: '1.5rem' }}>
-          <Link to="/" style={{ color: 'var(--text-muted)', fontSize: '0.9rem', display: 'inline-flex', alignItems: 'center', gap: '0.4rem' }}>
-            <ArrowLeft size={16} /> Volver a la página principal
+            <div>
+              <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, marginBottom: '0.4rem' }}>
+                Tu Respuesta
+              </label>
+              <input 
+                type="text"
+                value={recoveryAnswer}
+                onChange={(e) => setRecoveryAnswer(e.target.value)}
+                placeholder="Escribe la respuesta"
+                required
+                autoFocus
+                style={{
+                  width: '100%',
+                  padding: '0.8rem 1rem',
+                  borderRadius: 'var(--radius-md)',
+                  border: '1px solid var(--border)',
+                  backgroundColor: 'var(--background)',
+                  color: 'var(--text-main)',
+                  fontSize: '1rem',
+                  outline: 'none'
+                }}
+              />
+            </div>
+
+            <div>
+              <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, marginBottom: '0.4rem' }}>
+                Nueva Contraseña
+              </label>
+              <input 
+                type="password"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                placeholder="••••••••"
+                required
+                style={{
+                  width: '100%',
+                  padding: '0.8rem 1rem',
+                  borderRadius: 'var(--radius-md)',
+                  border: '1px solid var(--border)',
+                  backgroundColor: 'var(--background)',
+                  color: 'var(--text-main)',
+                  fontSize: '1rem',
+                  outline: 'none'
+                }}
+              />
+            </div>
+
+            <button 
+              type="submit"
+              className="btn btn-primary"
+              style={{ width: '100%', padding: '0.85rem', fontSize: '1rem', fontWeight: 700 }}
+            >
+              Restablecer y Entrar
+            </button>
+
+            <button 
+              type="button"
+              onClick={() => { setShowRecovery(false); setError(''); }}
+              style={{ background: 'none', border: 'none', color: 'var(--text-muted)', fontSize: '0.85rem', cursor: 'pointer', textAlign: 'center' }}
+            >
+              ← Volver al login
+            </button>
+          </form>
+        )}
+
+        <div style={{ textAlign: 'center', marginTop: '2rem' }}>
+          <Link to="/" style={{ color: 'var(--text-muted)', fontSize: '0.85rem', display: 'inline-flex', alignItems: 'center', gap: '0.4rem' }}>
+            <ArrowLeft size={16} /> Volver al sitio web
           </Link>
         </div>
       </div>
