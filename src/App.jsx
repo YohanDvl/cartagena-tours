@@ -17,7 +17,7 @@ import CookieBanner from './components/CookieBanner';
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(!!localStorage.getItem('admin_token'));
   const location = useLocation();
-  const isAdminRoute = location.pathname.startsWith('/admin');
+  const isAdminRoute = location.pathname.startsWith('/admin') || location.hash.includes('/admin');
 
   const handleLogout = () => {
     localStorage.removeItem('admin_token');
@@ -26,7 +26,7 @@ function App() {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
-      <Navbar />
+      {!isAdminRoute && <Navbar />}
       <main style={{ flex: 1 }}>
         <Routes>
           <Route path="/" element={<Home />} />
@@ -42,7 +42,7 @@ function App() {
           <Route path="/admin/apartments/:id" element={isAuthenticated ? <AdminApartmentForm /> : <Navigate to="/admin/login" />} />
         </Routes>
       </main>
-      <Footer />
+      {!isAdminRoute && <Footer />}
       {!isAdminRoute && <WhatsAppButton />}
       <CookieBanner />
     </div>

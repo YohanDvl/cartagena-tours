@@ -58,16 +58,16 @@ export default function Home() {
       {/* Hero Section */}
       <section id="home" style={{
         position: 'relative',
-        height: '85vh',
-        minHeight: '600px',
+        height: '88vh',
+        minHeight: '620px',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        color: 'white',
+        color: '#ffffff',
         textAlign: 'center',
         overflow: 'hidden'
       }}>
-        {/* Background Image with Overlay */}
+        {/* Background Image */}
         <div style={{
           position: 'absolute',
           top: 0,
@@ -79,26 +79,70 @@ export default function Home() {
           backgroundPosition: 'center',
           zIndex: -2
         }}></div>
+        {/* High Contrast Dark Overlay for Maximum Readability */}
         <div style={{
           position: 'absolute',
           top: 0,
           left: 0,
           width: '100%',
           height: '100%',
-          backgroundColor: 'rgba(20, 20, 20, 0.45)',
-          backgroundImage: 'linear-gradient(to bottom, rgba(10, 10, 10, 0.3) 0%, rgba(10, 10, 10, 0.75) 100%)',
+          backgroundColor: 'rgba(15, 23, 42, 0.65)',
+          backgroundImage: 'linear-gradient(to bottom, rgba(10, 15, 30, 0.45) 0%, rgba(10, 15, 30, 0.88) 100%)',
           zIndex: -1
         }}></div>
 
         <div className="container animate-fade-in" style={{ zIndex: 1, padding: '0 1rem' }}>
-          <span className="badge badge-accent" style={{ marginBottom: '1.5rem', display: 'inline-block', letterSpacing: '0.1em', padding: '0.6rem 1.2rem', fontSize: '0.9rem', fontWeight: 700 }}>
-            EXPLORA CARTAGENA DE INDIAS
-          </span>
-          <h1 style={{ fontSize: 'clamp(2.5rem, 6vw, 4.5rem)', fontWeight: 800, marginBottom: '1.5rem', lineHeight: 1.1, textShadow: '0 4px 20px rgba(0,0,0,0.6)' }}>
-            Descansa Seguro, <br />
-            <span style={{ color: 'var(--primary)' }}>Explora Sin Límites</span>
+          
+          {/* Badge Notable y Luminoso */}
+          <div style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '0.5rem',
+            backgroundColor: '#ffffff',
+            color: '#0f172a',
+            padding: '0.65rem 1.5rem',
+            borderRadius: '9999px',
+            fontWeight: 800,
+            fontSize: '0.85rem',
+            letterSpacing: '0.12em',
+            textTransform: 'uppercase',
+            boxShadow: '0 4px 20px rgba(0, 0, 0, 0.4)',
+            marginBottom: '1.8rem',
+            border: '2px solid rgba(255, 255, 255, 0.9)'
+          }}>
+            🌴 EXPLORA CARTAGENA DE INDIAS
+          </div>
+
+          {/* Refrán con Colores Vivos y Contraste Total */}
+          <h1 style={{
+            fontSize: 'clamp(2.7rem, 6vw, 4.8rem)',
+            fontWeight: 900,
+            marginBottom: '1.5rem',
+            lineHeight: 1.15,
+            letterSpacing: '-0.02em',
+            textShadow: '0 4px 25px rgba(0, 0, 0, 0.95), 0 2px 8px rgba(0, 0, 0, 0.9)'
+          }}>
+            <span style={{ color: '#ffffff', display: 'block' }}>
+              Descansa Seguro,
+            </span>
+            <span style={{
+              color: '#fbbf24',
+              display: 'block',
+              textShadow: '0 4px 30px rgba(0, 0, 0, 0.95), 0 0 35px rgba(251, 191, 36, 0.6)'
+            }}>
+              Explora Sin Límites.
+            </span>
           </h1>
-          <p style={{ fontSize: 'clamp(1.1rem, 2vw, 1.35rem)', maxWidth: '750px', margin: '0 auto 2.5rem auto', color: 'rgba(255,255,255,0.95)', textShadow: '0 2px 10px rgba(0,0,0,0.5)' }}>
+
+          <p style={{
+            fontSize: 'clamp(1.1rem, 2vw, 1.35rem)',
+            maxWidth: '750px',
+            margin: '0 auto 2.5rem auto',
+            color: '#f8fafc',
+            fontWeight: 500,
+            lineHeight: 1.6,
+            textShadow: '0 2px 12px rgba(0, 0, 0, 0.9)'
+          }}>
             Tours exclusivos, alquiler de botes deportivos y apartamentos vacacionales con atención VIP personalizada en Cartagena.
           </p>
           

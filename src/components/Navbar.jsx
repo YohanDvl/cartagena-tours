@@ -137,7 +137,7 @@ export default function Navbar() {
           
 
           <a 
-            href="https://wa.me/573009446681?text=Hola!%20Quiero%20informaci%C3%B3n%20sobre%20los%20tours%20en%20Cartagena"
+            href="https://wa.me/573015147536?text=Hola!%20Quiero%20informaci%C3%B3n%20sobre%20los%20tours%20en%20Cartagena"
             target="_blank"
             rel="noopener noreferrer"
             className="btn btn-primary"
@@ -175,7 +175,7 @@ export default function Navbar() {
           <a href="#about" onClick={(e) => handleNavClick(e, 'about')} style={{ color: 'var(--text-main)', fontWeight: 600, fontSize: '1.1rem' }}>Nosotros</a>
           
           <a 
-            href="https://wa.me/573009446681" 
+            href="https://wa.me/573015147536" 
             target="_blank" 
             rel="noopener noreferrer" 
             className="btn btn-primary"

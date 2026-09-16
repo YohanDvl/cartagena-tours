@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 
 export default function WhatsAppButton() {
   const [isAccepted, setIsAccepted] = useState(false);
-  const phoneNumber = "573009446681"; // El número que me diste
+  const phoneNumber = "573015147536"; // El número que me diste
   const message = encodeURIComponent("¡Hola Yohan! 👋 Vi tu catálogo de Youtours y me gustaría solicitar más información sobre una experiencia.");
   
   useEffect(() => {

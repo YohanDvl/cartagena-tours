@@ -31,7 +31,7 @@ export default function BookingModal({ tour, isOpen, onClose }) {
     
     // Simulate booking process - In reality this would go to a backend or WhatsApp
     const message = `Hola! Quiero reservar el tour: ${tour.title}%0AFecha: ${selectedDate.toLocaleDateString()}%0AAdultos: ${parsedAdults}%0ANiños: ${parsedChildren}%0ATotal estimado: $${total.toLocaleString('es-CO')} COP`;
-    const whatsappUrl = `https://wa.me/573009446681?text=${message}`;
+    const whatsappUrl = `https://wa.me/573015147536?text=${message}`;
     
     window.open(whatsappUrl, '_blank');
     onClose();

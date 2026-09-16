@@ -35,7 +35,7 @@ export default function ApartmentBookingModal({ apartment, isOpen, onClose }) {
     const checkIn = startDate ? startDate.toLocaleDateString() : 'No definida';
     const checkOut = endDate ? endDate.toLocaleDateString() : 'No definida';
     const message = `Hola! Quiero reservar el apartamento: ${apartment.title}%0ADesde: ${checkIn}%0AHasta: ${checkOut}%0ANoches: ${nights}%0AHuéspedes: ${parsedGuests}%0ATotal estimado: $${total.toLocaleString('es-CO')} COP`;
-    const whatsappUrl = `https://wa.me/573009446681?text=${message}`;
+    const whatsappUrl = `https://wa.me/573015147536?text=${message}`;
     
     window.open(whatsappUrl, '_blank');
     onClose();

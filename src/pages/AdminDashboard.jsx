@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Edit, Trash2, Plus, LogOut, Compass, Building, RefreshCw, Eye, Sparkles } from 'lucide-react';
+import { Edit, Trash2, Plus, LogOut, Compass, Building, RefreshCw, Eye } from 'lucide-react';
 import { store } from '../data/store';
 import { getImageUrl } from '../utils/imageUrl';
 
@@ -71,44 +71,111 @@ export default function AdminDashboard({ onLogout }) {
   );
 
   return (
-    <div style={{ backgroundColor: 'var(--background)', minHeight: '90vh', padding: '3rem 0' }}>
-      <div className="container">
-        
-        {/* Header Bar */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1.5rem', marginBottom: '2.5rem' }}>
-          <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.4rem' }}>
-              <h1 style={{ fontSize: '2rem', fontWeight: 800 }}>Panel de Administración</h1>
-              <span style={{ backgroundColor: '#10b981', color: '#fff', padding: '0.2rem 0.6rem', borderRadius: 'var(--radius-full)', fontSize: '0.75rem', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
-                <Sparkles size={12} /> Activo & Persistente
-              </span>
+    <div style={{ backgroundColor: 'var(--background)', minHeight: '100vh', paddingBottom: '4rem' }}>
+      
+      {/* Dedicated Clean Admin Topbar */}
+      <header style={{
+        backgroundColor: 'var(--surface)',
+        borderBottom: '1px solid var(--border)',
+        padding: '0.9rem 0',
+        boxShadow: 'var(--shadow-sm)',
+        position: 'sticky',
+        top: 0,
+        zIndex: 40
+      }}>
+        <div className="container" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem' }}>
+            <img 
+              src={getImageUrl('/images/favicon-square.svg')} 
+              alt="YouTours" 
+              style={{ height: '40px', width: '40px', objectFit: 'contain' }} 
+            />
+            <div>
+              <div style={{ fontFamily: 'Outfit', fontWeight: 800, fontSize: '1.25rem', lineHeight: 1.1, color: 'var(--text-main)' }}>
+                YOUTOURS
+              </div>
+              <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: 600 }}>
+                Panel de Administración Privado
+              </div>
             </div>
-            <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem' }}>
-              Gestiona el catálogo de experiencias y hospedajes de YouTours Cartagena.
-            </p>
           </div>
 
-          <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
-            <Link to="/" className="btn" style={{ backgroundColor: 'var(--surface)', border: '1px solid var(--border)', color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              <Eye size={18} /> Ver Sitio Web
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
+            <Link 
+              to="/" 
+              className="btn" 
+              style={{ 
+                backgroundColor: 'var(--background)', 
+                border: '1px solid var(--border)', 
+                color: 'var(--text-main)', 
+                fontSize: '0.85rem', 
+                padding: '0.5rem 1rem', 
+                display: 'inline-flex', 
+                alignItems: 'center', 
+                gap: '0.4rem',
+                borderRadius: 'var(--radius-md)'
+              }}
+            >
+              <Eye size={16} /> Ver Sitio Web
             </Link>
-            <button onClick={handleResetDefaults} className="btn" style={{ backgroundColor: 'var(--surface)', border: '1px solid var(--border)', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              <RefreshCw size={16} /> Restaurar Catálogo
+            <button 
+              onClick={handleResetDefaults} 
+              className="btn" 
+              style={{ 
+                backgroundColor: 'var(--background)', 
+                border: '1px solid var(--border)', 
+                color: 'var(--text-muted)', 
+                fontSize: '0.85rem', 
+                padding: '0.5rem 1rem', 
+                display: 'inline-flex', 
+                alignItems: 'center', 
+                gap: '0.4rem',
+                borderRadius: 'var(--radius-md)'
+              }}
+            >
+              <RefreshCw size={15} /> Restaurar Catálogo
             </button>
-            <button onClick={onLogout} className="btn" style={{ backgroundColor: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', border: '1px solid #ef4444', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              <LogOut size={18} /> Cerrar Sesión
+            <button 
+              onClick={onLogout} 
+              className="btn" 
+              style={{ 
+                backgroundColor: 'rgba(239, 68, 68, 0.1)', 
+                color: '#ef4444', 
+                border: '1px solid rgba(239, 68, 68, 0.3)', 
+                fontSize: '0.85rem', 
+                padding: '0.5rem 1rem', 
+                display: 'inline-flex', 
+                alignItems: 'center', 
+                gap: '0.4rem',
+                borderRadius: 'var(--radius-md)'
+              }}
+            >
+              <LogOut size={16} /> Cerrar Sesión
             </button>
           </div>
         </div>
+      </header>
+
+      {/* Main Admin Content */}
+      <div className="container" style={{ paddingTop: '2.5rem' }}>
+        
+        <div style={{ marginBottom: '2rem' }}>
+          <h1 style={{ fontSize: '1.85rem', fontWeight: 800, marginBottom: '0.3rem', color: 'var(--text-main)' }}>
+            Gestión de Catálogo
+          </h1>
+          <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem' }}>
+            Administra precios, descripciones, itinerarios y fotografías de tours y apartamentos.
+          </p>
+        </div>
 
         {notification && (
-          <div style={{ backgroundColor: '#10b981', color: '#fff', padding: '1rem 1.5rem', borderRadius: 'var(--radius-md)', marginBottom: '2rem', fontWeight: 600, boxShadow: 'var(--shadow-md)' }}>
+          <div style={{ backgroundColor: '#10b981', color: '#fff', padding: '0.9rem 1.4rem', borderRadius: 'var(--radius-md)', marginBottom: '1.5rem', fontWeight: 600, boxShadow: 'var(--shadow-md)' }}>
             {notification}
           </div>
         )}
 
         {/* Tab & Search Bar */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1.5rem', marginBottom: '2rem' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1.2rem', marginBottom: '2rem' }}>
           <div style={{ display: 'flex', gap: '0.5rem', backgroundColor: 'var(--surface)', padding: '0.3rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border)' }}>
             <button 
               onClick={() => setActiveTab('tours')}
@@ -175,7 +242,7 @@ export default function AdminDashboard({ onLogout }) {
           </div>
         </div>
 
-        {/* Content Table / Cards */}
+        {/* Content Table */}
         {loading ? (
           <div style={{ textAlign: 'center', padding: '4rem 0' }}>
             <h3>Cargando registros...</h3>

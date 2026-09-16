@@ -65,8 +65,8 @@ export default function Footer() {
             </li>
             <li style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', color: 'var(--text-muted)' }}>
               <Phone size={20} style={{ color: 'var(--primary)', flexShrink: 0 }} />
-              <a href="https://wa.me/573009446681" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--text-main)', fontWeight: 700 }}>
-                +57 300 944 6681
+              <a href="https://wa.me/573015147536" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--text-main)', fontWeight: 700 }}>
+                +57 301 514 7536
               </a>
             </li>
           </ul>
