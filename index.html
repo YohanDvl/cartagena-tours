@@ -1,13 +1,124 @@
 <!doctype html>
 <html lang="es">
   <head>
+    <!-- Character Encoding & Responsive Viewport -->
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/images/favicon-square.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Youtours</title>
+    
+    <!-- Primary Page Title & High Authority SEO -->
+    <title>YouTours Cartagena | Tours, Islas del Rosario & Botes Privados en Cartagena</title>
+    <meta name="title" content="YouTours Cartagena | Tours, Islas del Rosario & Botes Privados en Cartagena" />
+    <meta name="description" content="Descubre las mejores experiencias turísticas en Cartagena de Indias con YouTours: Tours exclusivos a Islas del Rosario, botes privados, Chiva Rumbera, Ciudad Amurallada y alquiler de apartamentos turísticos de lujo. Reserva directa por WhatsApp." />
+    <meta name="keywords" content="tours cartagena, islas del rosario, botes privados cartagena, alquiler botes cartagena, cholon, chiva rumbera, apartamentos cartagena bocagrande, ciudad amurallada, volcan del totumo, catamaran cartagena, youtours, turismo cartagena colombia" />
+    <meta name="author" content="Yohan Alexander Maldonado Santana" />
+    <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
+    <meta name="theme-color" content="#f97316" />
+
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://yohandvl.github.io/cartagena-tours/" />
+
+    <!-- Favicon & Touch Icons -->
+    <link rel="icon" type="image/svg+xml" href="./images/favicon-square.svg" />
+    <link rel="apple-touch-icon" href="./images/logoredondo.png" />
+
+    <!-- Open Graph / Facebook / WhatsApp Preview -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://yohandvl.github.io/cartagena-tours/" />
+    <meta property="og:site_name" content="YouTours Cartagena" />
+    <meta property="og:title" content="YouTours Cartagena | Tours, Botes Privados & Apartamentos en Cartagena" />
+    <meta property="og:description" content="Vive las mejores vacaciones en Cartagena de Indias. Tours en yate a Islas del Rosario, recorridos coloniales y hospedaje exclusivo con atención VIP directa por WhatsApp." />
+    <meta property="og:image" content="https://yohandvl.github.io/cartagena-tours/images/islas_del_rosario.png" />
+    <meta property="og:image:alt" content="Tours a Islas del Rosario en Cartagena - YouTours" />
+    <meta property="og:locale" content="es_CO" />
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:url" content="https://yohandvl.github.io/cartagena-tours/" />
+    <meta name="twitter:title" content="YouTours Cartagena | Tours, Islas del Rosario & Botes Privados" />
+    <meta name="twitter:description" content="Tours exclusivos, alquiler de yates y hospedaje en Cartagena de Indias con confirmación inmediata." />
+    <meta name="twitter:image" content="https://yohandvl.github.io/cartagena-tours/images/islas_del_rosario.png" />
+
+    <!-- Geo-Targeting Metadata (Cartagena de Indias, Bolívar, Colombia) -->
+    <meta name="geo.region" content="CO-BOL" />
+    <meta name="geo.placename" content="Cartagena de Indias" />
+    <meta name="geo.position" content="10.4243;-75.5478" />
+    <meta name="ICBM" content="10.4243, -75.5478" />
+
+    <!-- Google Fonts Preconnect -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+    <!-- Structured Data: Schema.org JSON-LD for Google Rich Snippets -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "TravelAgency",
+          "@id": "https://yohandvl.github.io/cartagena-tours/#agency",
+          "name": "YouTours Cartagena",
+          "url": "https://yohandvl.github.io/cartagena-tours/",
+          "logo": "https://yohandvl.github.io/cartagena-tours/images/logoredondo.png",
+          "image": "https://yohandvl.github.io/cartagena-tours/images/islas_del_rosario.png",
+          "description": "Agencia de turismo líder en Cartagena de Indias especializada en tours a Islas del Rosario, alquiler de botes deportivos, paseos en catamarán y apartamentos turísticos.",
+          "telephone": "+573009446681",
+          "priceRange": "$$",
+          "currenciesAccepted": "COP, USD",
+          "paymentAccepted": "Cash, Credit Card, Bank Transfer, WhatsApp Pay",
+          "address": {
+            "@type": "PostalAddress",
+            "streetAddress": "Centro Histórico & Bocagrande",
+            "addressLocality": "Cartagena de Indias",
+            "addressRegion": "Bolívar",
+            "postalCode": "130001",
+            "addressCountry": "CO"
+          },
+          "geo": {
+            "@type": "GeoCoordinates",
+            "latitude": 10.4243,
+            "longitude": -75.5478
+          },
+          "openingHoursSpecification": [
+            {
+              "@type": "OpeningHoursSpecification",
+              "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
+              "opens": "07:00",
+              "closes": "22:00"
+            }
+          ],
+          "aggregateRating": {
+            "@type": "AggregateRating",
+            "ratingValue": "4.9",
+            "bestRating": "5",
+            "worstRating": "1",
+            "ratingCount": "285"
+          },
+          "sameAs": [
+            "https://www.instagram.com/youtours",
+            "https://yohandvl.github.io/portfolio/"
+          ]
+        },
+        {
+          "@type": "WebSite",
+          "@id": "https://yohandvl.github.io/cartagena-tours/#website",
+          "url": "https://yohandvl.github.io/cartagena-tours/",
+          "name": "YouTours Cartagena",
+          "publisher": {
+            "@id": "https://yohandvl.github.io/cartagena-tours/#agency"
+          },
+          "potentialAction": {
+            "@type": "SearchAction",
+            "target": "https://yohandvl.github.io/cartagena-tours/?q={search_term_string}",
+            "query-input": "required name=search_term_string"
+          }
+        }
+      ]
+    }
+    </script>
   </head>
   <body>
     <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
+    <script type="module" src="./src/main.jsx"></script>
   </body>
 </html>

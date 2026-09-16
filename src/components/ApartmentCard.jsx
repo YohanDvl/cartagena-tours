@@ -1,18 +1,17 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Users, ChevronLeft, ChevronRight, Star, Flame } from 'lucide-react';
+import { getImageUrl } from '../utils/imageUrl';
 
 export default function ApartmentCard({ apartment }) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const images = apartment.images || [apartment.image];
+  const images = apartment.images && apartment.images.length > 0 ? apartment.images : (apartment.image ? [apartment.image] : []);
 
   useEffect(() => {
     if (images.length <= 1) return;
-    
     const interval = setInterval(() => {
       setCurrentImageIndex((prev) => (prev + 1) % images.length);
-    }, 4000); // Change image every 4 seconds
-
+    }, 4000);
     return () => clearInterval(interval);
   }, [images.length]);
 
@@ -42,11 +41,11 @@ export default function ApartmentCard({ apartment }) {
         height: '100%'
       }}
     >
-      <div style={{ position: 'relative', height: '220px', overflow: 'hidden' }} className="image-container">
+      <div style={{ position: 'relative', height: '230px', overflow: 'hidden' }} className="image-container">
         {images.map((img, idx) => (
           <img 
             key={idx}
-            src={img} 
+            src={getImageUrl(img)} 
             alt={`${apartment.title} ${idx + 1}`} 
             style={{ 
               position: 'absolute',
@@ -63,25 +62,14 @@ export default function ApartmentCard({ apartment }) {
           />
         ))}
 
-        {/* Carousel Controls */}
         {images.length > 1 && (
           <>
-            <button 
-              onClick={prevImage}
-              className="carousel-btn"
-              style={{ left: '0.5rem' }}
-            >
+            <button onClick={prevImage} className="carousel-btn" style={{ left: '0.5rem' }}>
               <ChevronLeft size={20} />
             </button>
-            <button 
-              onClick={nextImage}
-              className="carousel-btn"
-              style={{ right: '0.5rem' }}
-            >
+            <button onClick={nextImage} className="carousel-btn" style={{ right: '0.5rem' }}>
               <ChevronRight size={20} />
             </button>
-            
-            {/* Indicators */}
             <div style={{ 
               position: 'absolute', 
               bottom: '0.75rem', 
@@ -98,7 +86,7 @@ export default function ApartmentCard({ apartment }) {
                     width: '6px', 
                     height: '6px', 
                     borderRadius: '50%', 
-                    backgroundColor: idx === currentImageIndex ? 'var(--primary)' : 'rgba(255,255,255,0.5)',
+                    backgroundColor: idx === currentImageIndex ? 'var(--primary)' : 'rgba(255,255,255,0.6)',
                     transition: 'var(--transition)'
                   }}
                 />
@@ -108,7 +96,7 @@ export default function ApartmentCard({ apartment }) {
         )}
 
         <div style={{ position: 'absolute', top: '1rem', left: '1rem', zIndex: 10 }}>
-          <span className="badge badge-accent" style={{ color: 'var(--text-main)', fontWeight: 700, backgroundColor: 'rgba(255,255,255,0.9)' }}>
+          <span className="badge badge-accent" style={{ color: 'var(--text-main)', fontWeight: 700, backgroundColor: 'rgba(255,255,255,0.92)' }}>
             {apartment.category}
           </span>
         </div>
@@ -128,9 +116,10 @@ export default function ApartmentCard({ apartment }) {
         
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', color: 'var(--accent-gold)', marginBottom: '0.5rem', fontSize: '0.9rem', fontWeight: 600 }}>
           <Star size={16} fill="currentColor" /> {apartment.rating || 5.0}
+          <span style={{ color: 'var(--text-light)', fontWeight: 400, marginLeft: '0.3rem' }}>({apartment.reviews || 40} reseñas)</span>
         </div>
         
-        <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '1rem', flex: 1 }}>
+        <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '1rem', flex: 1, lineHeight: 1.5 }}>
           {apartment.shortDescription}
         </p>
         
@@ -139,14 +128,14 @@ export default function ApartmentCard({ apartment }) {
           <span>Capacidad: {apartment.duration}</span>
         </div>
         
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 'auto' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 'auto', paddingTop: '0.75rem', borderTop: '1px solid var(--border)' }}>
           <div>
-            <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', display: 'block' }}>Por Noche desde</span>
+            <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'block' }}>Por Noche desde</span>
             <span style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--primary)', fontFamily: 'Outfit' }}>
-              ${apartment.price.toLocaleString('es-CO')} <span style={{ fontSize: '0.8rem', fontWeight: 400 }}>COP</span>
+              ${apartment.price.toLocaleString('es-CO')} <span style={{ fontSize: '0.75rem', fontWeight: 400 }}>COP</span>
             </span>
           </div>
-          <Link to={`/apartamento/${apartment.id}`} className="btn btn-primary" style={{ padding: '0.5rem 1rem' }}>
+          <Link to={`/apartamento/${apartment.id}`} className="btn btn-primary" style={{ padding: '0.5rem 1rem', fontSize: '0.9rem' }}>
             Ver Detalles
           </Link>
         </div>
@@ -154,17 +143,17 @@ export default function ApartmentCard({ apartment }) {
 
       <style>{`
         .tour-card:hover {
-          transform: translateY(-5px);
-          box-shadow: var(--shadow-lg);
+          transform: translateY(-8px) scale(1.01);
+          box-shadow: var(--shadow-xl);
         }
         .tour-card:hover .card-img {
-          transform: scale(1.05);
+          transform: scale(1.08);
         }
         .carousel-btn {
           position: absolute;
           top: 50%;
           transform: translateY(-50%);
-          background: rgba(0, 0, 0, 0.3);
+          background: rgba(0, 0, 0, 0.4);
           color: white;
           width: 32px;
           height: 32px;

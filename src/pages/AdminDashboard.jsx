@@ -1,432 +1,354 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Edit, Trash2, Plus, LogOut, Settings as SettingsIcon, Map, CheckCircle2, AlertCircle, Building } from 'lucide-react';
+import { Edit, Trash2, Plus, LogOut, Compass, Building, RefreshCw, Eye, Sparkles } from 'lucide-react';
+import { store } from '../data/store';
+import { getImageUrl } from '../utils/imageUrl';
 
 export default function AdminDashboard({ onLogout }) {
-  const [activeTab, setActiveTab] = useState('tours');
+  const [activeTab, setActiveTab] = useState('tours'); // 'tours' | 'apartments'
   const [tours, setTours] = useState([]);
   const [apartments, setApartments] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(true);
-
-  // Settings State
-  const [config, setConfig] = useState({ username: '', securityQuestion: '' });
-  const [settingsForm, setSettingsForm] = useState({
-    currentPassword: '',
-    newUsername: '',
-    newPassword: '',
-    securityQuestion: '',
-    securityAnswer: ''
-  });
-  const [settingsMessage, setSettingsMessage] = useState('');
-  const [settingsError, setSettingsError] = useState('');
-
-  // Delete Modal State
+  const [notification, setNotification] = useState('');
   const [deleteModal, setDeleteModal] = useState({ isOpen: false, type: 'tour', itemId: null, itemTitle: '' });
-
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetchTours();
-    fetchApartments();
-    fetchConfig();
+    loadAll();
   }, []);
 
-  const getAuthHeaders = () => {
-    const token = localStorage.getItem('admin_token');
-    return {
-      'Authorization': `Bearer ${token}`,
-      'Content-Type': 'application/json'
-    };
+  const loadAll = async () => {
+    setLoading(true);
+    try {
+      const [toursData, aptsData] = await Promise.all([
+        store.getTours(),
+        store.getApartments()
+      ]);
+      setTours(toursData);
+      setApartments(aptsData);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const fetchTours = () => {
-    fetch('/api/tours')
-      .then(res => res.json())
-      .then(data => {
-        setTours(data);
-        setLoading(false);
-      })
-      .catch(err => {
-        console.error('Error fetching tours:', err);
-        setLoading(false);
-      });
+  const showNotification = (msg) => {
+    setNotification(msg);
+    setTimeout(() => setNotification(''), 4000);
   };
 
-  const fetchApartments = () => {
-    fetch('/api/apartments')
-      .then(res => res.json())
-      .then(data => {
-        setApartments(data);
-      })
-      .catch(err => {
-        console.error('Error fetching apartments:', err);
-      });
-  };
-
-  const fetchConfig = () => {
-    fetch('/api/admin/config', { headers: getAuthHeaders() })
-      .then(res => {
-        if(res.status === 401 || res.status === 403) {
-           onLogout();
-           return;
-        }
-        return res.json();
-      })
-      .then(data => {
-        if(data && data.username) {
-          setConfig(data);
-          setSettingsForm(prev => ({ ...prev, newUsername: data.username, securityQuestion: data.securityQuestion || '' }));
-        }
-      })
-      .catch(err => console.error(err));
-  };
-
-  const confirmDelete = () => {
+  const handleDelete = async () => {
     if (!deleteModal.itemId) return;
-    const url = deleteModal.type === 'tour' ? `/api/tours/${deleteModal.itemId}` : `/api/apartments/${deleteModal.itemId}`;
-    
-    fetch(url, { method: 'DELETE', headers: getAuthHeaders() })
-      .then(() => {
-        if (deleteModal.type === 'tour') {
-          fetchTours();
-        } else {
-          fetchApartments();
-        }
-        setDeleteModal({ isOpen: false, type: 'tour', itemId: null, itemTitle: '' });
-      })
-      .catch(err => {
-        if (err.status === 401 || err.status === 403) onLogout();
-        console.error(err);
-        setDeleteModal({ isOpen: false, type: 'tour', itemId: null, itemTitle: '' });
-      });
+    if (deleteModal.type === 'tour') {
+      await store.deleteTour(deleteModal.itemId);
+      showNotification(`Tour "${deleteModal.itemTitle}" eliminado con éxito.`);
+    } else {
+      await store.deleteApartment(deleteModal.itemId);
+      showNotification(`Apartamento "${deleteModal.itemTitle}" eliminado con éxito.`);
+    }
+    setDeleteModal({ isOpen: false, type: 'tour', itemId: null, itemTitle: '' });
+    loadAll();
   };
 
-  const handleSettingsSubmit = (e) => {
-    e.preventDefault();
-    setSettingsMessage('');
-    setSettingsError('');
-    
-    fetch('/api/admin/config', {
-      method: 'PUT',
-      headers: getAuthHeaders(),
-      body: JSON.stringify(settingsForm)
-    })
-    .then(res => {
-      if(res.status === 401 || res.status === 403) {
-         if (res.status === 401) setSettingsError('Contraseña actual incorrecta o sesión expirada');
-         return res.json();
-      }
-      return res.json();
-    })
-    .then(data => {
-      if(data.success) {
-        setSettingsMessage('Configuración actualizada correctamente.');
-        setSettingsForm(prev => ({ ...prev, currentPassword: '', newPassword: '', securityAnswer: '' }));
-        fetchConfig();
-        // Auto-hide toast after 3 seconds
-        setTimeout(() => setSettingsMessage(''), 3000);
-      } else if (data.error) {
-        setSettingsError(data.error);
-        setTimeout(() => setSettingsError(''), 4000);
-      }
-    })
-    .catch(err => {
-       setSettingsError('Error de conexión');
-    });
+  const handleResetDefaults = () => {
+    if (window.confirm('¿Restaurar los tours y apartamentos a sus datos originales?')) {
+      store.resetDefaults();
+      loadAll();
+      showNotification('Catálogo restaurado a valores iniciales.');
+    }
   };
 
-  if (loading) return <div style={{ padding: '100px 2rem 4rem', textAlign: 'center' }}>Cargando Panel...</div>;
-
-  const filteredTours = tours.filter(tour => 
-    tour.title?.toLowerCase().includes(searchQuery.toLowerCase()) || 
-    tour.category?.toLowerCase().includes(searchQuery.toLowerCase())
+  const filteredTours = tours.filter(t => 
+    t.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    (t.category && t.category.toLowerCase().includes(searchQuery.toLowerCase()))
   );
 
-  const filteredApartments = apartments.filter(apt => 
-    apt.title?.toLowerCase().includes(searchQuery.toLowerCase()) || 
-    apt.category?.toLowerCase().includes(searchQuery.toLowerCase())
+  const filteredApartments = apartments.filter(a => 
+    a.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    (a.category && a.category.toLowerCase().includes(searchQuery.toLowerCase()))
   );
 
   return (
-    <div style={{ padding: '100px 2rem 4rem', maxWidth: '1200px', margin: '0 auto', backgroundColor: 'var(--background)' }}>
-      {/* Floating Notifications */}
-      {settingsMessage && (
-        <div style={{ position: 'fixed', top: '3rem', left: '50%', transform: 'translateX(-50%)', backgroundColor: '#22c55e', color: 'white', padding: '1rem 1.5rem', borderRadius: 'var(--radius-md)', boxShadow: '0 10px 25px rgba(34, 197, 94, 0.4)', zIndex: 9999, display: 'flex', alignItems: 'center', gap: '0.75rem', fontWeight: 'bold', animation: 'slideDown 0.3s ease-out' }}>
-          <CheckCircle2 size={24} />
-          {settingsMessage}
-        </div>
-      )}
-      {settingsError && (
-        <div style={{ position: 'fixed', top: '3rem', left: '50%', transform: 'translateX(-50%)', backgroundColor: '#ef4444', color: 'white', padding: '1rem 1.5rem', borderRadius: 'var(--radius-md)', boxShadow: '0 10px 25px rgba(239, 68, 68, 0.4)', zIndex: 9999, display: 'flex', alignItems: 'center', gap: '0.75rem', fontWeight: 'bold', animation: 'slideDown 0.3s ease-out' }}>
-          <AlertCircle size={24} />
-          {settingsError}
-        </div>
-      )}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem', flexWrap: 'wrap', gap: '1rem' }}>
-        <h1 style={{ fontSize: '2.5rem', color: 'var(--text-main)' }}>Panel Administrativo</h1>
-        <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
-          <button onClick={onLogout} className="btn" style={{ border: '1px solid var(--border)', color: '#ef4444' }}>
-            <LogOut size={18} style={{ marginRight: '0.5rem' }} /> Cerrar Sesión
-          </button>
-          <Link to="/" className="btn" style={{ border: '1px solid var(--border)' }}>
-            <LogOut size={18} style={{ marginRight: '0.5rem', transform: 'rotate(180deg)' }} /> Ver Sitio Web
-          </Link>
-          <Link to="/admin/tours/new" className="btn btn-primary" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            <Plus size={20} /> Nuevo Tour
-          </Link>
-          <Link to="/admin/apartments/new" className="btn btn-primary" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            <Plus size={20} /> Nuevo Apartamento
-          </Link>
-        </div>
-      </div>
-
-      <div style={{ display: 'flex', gap: '1rem', marginBottom: '2rem', borderBottom: '1px solid var(--border)', paddingBottom: '1rem', overflowX: 'auto' }}>
-        <button 
-          onClick={() => setActiveTab('tours')} 
-          className="btn" 
-          style={{ backgroundColor: activeTab === 'tours' ? 'var(--primary)' : 'transparent', color: activeTab === 'tours' ? '#000' : 'var(--text-main)', whiteSpace: 'nowrap' }}>
-          <Map size={18} style={{ marginRight: '0.5rem' }} /> Mis Tours
-        </button>
-        <button 
-          onClick={() => setActiveTab('apartments')} 
-          className="btn" 
-          style={{ backgroundColor: activeTab === 'apartments' ? 'var(--primary)' : 'transparent', color: activeTab === 'apartments' ? '#000' : 'var(--text-main)', whiteSpace: 'nowrap' }}>
-          <Building size={18} style={{ marginRight: '0.5rem' }} /> Mis Apartamentos
-        </button>
-        <button 
-          onClick={() => setActiveTab('config')} 
-          className="btn" 
-          style={{ backgroundColor: activeTab === 'config' ? 'var(--primary)' : 'transparent', color: activeTab === 'config' ? '#000' : 'var(--text-main)', whiteSpace: 'nowrap' }}>
-          <SettingsIcon size={18} style={{ marginRight: '0.5rem' }} /> Configuración
-        </button>
-      </div>
-
-      {activeTab === 'tours' && (
-        <div style={{ backgroundColor: 'var(--surface)', borderRadius: 'var(--radius-lg)', overflow: 'hidden', boxShadow: 'var(--shadow-md)' }}>
-          <div style={{ padding: '1rem 1.5rem', borderBottom: '1px solid var(--border)', backgroundColor: 'rgba(255,255,255,0.02)' }}>
-            <input 
-              type="text" 
-              placeholder="Buscar tour por título o categoría..." 
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              style={{ width: '100%', maxWidth: '400px', padding: '0.6rem 1rem', borderRadius: 'var(--radius-full)', border: '1px solid var(--border)', backgroundColor: 'var(--background)', color: 'var(--text-main)', outline: 'none' }}
-            />
-          </div>
-          <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
-            <thead>
-              <tr style={{ backgroundColor: 'rgba(255,255,255,0.05)', borderBottom: '1px solid var(--border)' }}>
-                <th style={{ padding: '1rem', color: 'var(--text-muted)' }}>ID</th>
-                <th style={{ padding: '1rem', color: 'var(--text-muted)' }}>Título</th>
-                <th style={{ padding: '1rem', color: 'var(--text-muted)' }}>Categoría</th>
-                <th style={{ padding: '1rem', color: 'var(--text-muted)' }}>Precio</th>
-                <th style={{ padding: '1rem', color: 'var(--text-muted)' }}>Acciones</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredTours.map(tour => (
-                <tr key={tour.id} style={{ borderBottom: '1px solid var(--border)' }}>
-                  <td style={{ padding: '1rem' }}>{tour.id}</td>
-                  <td style={{ padding: '1rem', fontWeight: 'bold' }}>{tour.title}</td>
-                  <td style={{ padding: '1rem' }}>
-                    <span className="badge glass">{tour.category}</span>
-                  </td>
-                  <td style={{ padding: '1rem', color: 'var(--primary)' }}>${tour.price.toLocaleString('es-CO')}</td>
-                  <td style={{ padding: '1rem' }}>
-                    <div style={{ display: 'flex', gap: '0.5rem' }}>
-                      <Link to={`/admin/tours/${tour.id}`} className="btn" style={{ padding: '0.5rem', backgroundColor: 'rgba(37,99,235,0.1)', color: '#3b82f6' }}>
-                        <Edit size={18} />
-                      </Link>
-                      <button onClick={() => setDeleteModal({ isOpen: true, type: 'tour', itemId: tour.id, itemTitle: tour.title })} className="btn" style={{ padding: '0.5rem', backgroundColor: 'rgba(239,68,68,0.1)', color: '#ef4444' }}>
-                        <Trash2 size={18} />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-              {filteredTours.length === 0 && (
-                <tr>
-                  <td colSpan="5" style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-muted)' }}>
-                    {searchQuery ? 'No se encontraron tours con esa búsqueda.' : 'No hay tours creados todavía.'}
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-      )}
-
-      {activeTab === 'apartments' && (
-        <div style={{ backgroundColor: 'var(--surface)', borderRadius: 'var(--radius-lg)', overflow: 'hidden', boxShadow: 'var(--shadow-md)' }}>
-          <div style={{ padding: '1rem 1.5rem', borderBottom: '1px solid var(--border)', backgroundColor: 'rgba(255,255,255,0.02)' }}>
-            <input 
-              type="text" 
-              placeholder="Buscar apartamento por título o categoría..." 
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              style={{ width: '100%', maxWidth: '400px', padding: '0.6rem 1rem', borderRadius: 'var(--radius-full)', border: '1px solid var(--border)', backgroundColor: 'var(--background)', color: 'var(--text-main)', outline: 'none' }}
-            />
-          </div>
-          <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
-            <thead>
-              <tr style={{ backgroundColor: 'rgba(255,255,255,0.05)', borderBottom: '1px solid var(--border)' }}>
-                <th style={{ padding: '1rem', color: 'var(--text-muted)' }}>ID</th>
-                <th style={{ padding: '1rem', color: 'var(--text-muted)' }}>Título</th>
-                <th style={{ padding: '1rem', color: 'var(--text-muted)' }}>Categoría</th>
-                <th style={{ padding: '1rem', color: 'var(--text-muted)' }}>Precio / Noche</th>
-                <th style={{ padding: '1rem', color: 'var(--text-muted)' }}>Acciones</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredApartments.map(apt => (
-                <tr key={apt.id} style={{ borderBottom: '1px solid var(--border)' }}>
-                  <td style={{ padding: '1rem' }}>{apt.id}</td>
-                  <td style={{ padding: '1rem', fontWeight: 'bold' }}>{apt.title}</td>
-                  <td style={{ padding: '1rem' }}>
-                    <span className="badge glass">{apt.category}</span>
-                  </td>
-                  <td style={{ padding: '1rem', color: 'var(--primary)' }}>${apt.price.toLocaleString('es-CO')}</td>
-                  <td style={{ padding: '1rem' }}>
-                    <div style={{ display: 'flex', gap: '0.5rem' }}>
-                      <Link to={`/admin/apartments/${apt.id}`} className="btn" style={{ padding: '0.5rem', backgroundColor: 'rgba(37,99,235,0.1)', color: '#3b82f6' }}>
-                        <Edit size={18} />
-                      </Link>
-                      <button onClick={() => setDeleteModal({ isOpen: true, type: 'apartment', itemId: apt.id, itemTitle: apt.title })} className="btn" style={{ padding: '0.5rem', backgroundColor: 'rgba(239,68,68,0.1)', color: '#ef4444' }}>
-                        <Trash2 size={18} />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-              {filteredApartments.length === 0 && (
-                <tr>
-                  <td colSpan="5" style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-muted)' }}>
-                    {searchQuery ? 'No se encontraron apartamentos con esa búsqueda.' : 'No hay apartamentos creados todavía.'}
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-      )}
-
-      {activeTab === 'config' && (
-        <div style={{ backgroundColor: 'var(--surface)', borderRadius: 'var(--radius-lg)', padding: '2.5rem', maxWidth: '650px', boxShadow: 'var(--shadow-lg)' }}>
-          <h2 style={{ marginBottom: '1.5rem', color: 'var(--text-main)', fontSize: '1.8rem' }}>Configuración de Cuenta</h2>
-
-          <form onSubmit={handleSettingsSubmit}>
-            <div style={{ marginBottom: '1.5rem' }}>
-              <label style={{ display: 'block', marginBottom: '0.5rem', color: 'var(--text-muted)', fontWeight: '500' }}>
-                Usuario <span style={{ color: '#ef4444' }}>*</span>
-              </label>
-              <input 
-                type="text" 
-                value={settingsForm.newUsername} 
-                onChange={(e) => setSettingsForm({...settingsForm, newUsername: e.target.value})}
-                required
-                style={{ width: '100%', padding: '0.8rem', backgroundColor: 'var(--background)', border: '1px solid var(--border)', color: 'var(--text-main)', borderRadius: 'var(--radius-md)' }} 
-              />
+    <div style={{ backgroundColor: 'var(--background)', minHeight: '90vh', padding: '3rem 0' }}>
+      <div className="container">
+        
+        {/* Header Bar */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1.5rem', marginBottom: '2.5rem' }}>
+          <div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.4rem' }}>
+              <h1 style={{ fontSize: '2rem', fontWeight: 800 }}>Panel de Administración</h1>
+              <span style={{ backgroundColor: '#10b981', color: '#fff', padding: '0.2rem 0.6rem', borderRadius: 'var(--radius-full)', fontSize: '0.75rem', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
+                <Sparkles size={12} /> Activo & Persistente
+              </span>
             </div>
-            <div style={{ marginBottom: '1.5rem' }}>
-              <label style={{ display: 'block', marginBottom: '0.5rem', color: 'var(--text-muted)', fontWeight: '500' }}>Nueva Contraseña (Opcional)</label>
-              <input 
-                type="password" 
-                placeholder="Dejar en blanco para mantener la actual"
-                value={settingsForm.newPassword} 
-                onChange={(e) => setSettingsForm({...settingsForm, newPassword: e.target.value})}
-                style={{ width: '100%', padding: '0.8rem', backgroundColor: 'var(--background)', border: '1px solid var(--border)', color: 'var(--text-main)', borderRadius: 'var(--radius-md)' }} 
-              />
-            </div>
-            
-            <hr style={{ borderColor: 'var(--border)', margin: '2rem 0' }} />
-            
-            <h3 style={{ marginBottom: '1rem', color: 'var(--text-main)' }}>Recuperación de Contraseña</h3>
-            <p style={{ color: 'var(--text-muted)', marginBottom: '1rem', fontSize: '0.9rem' }}>
-              Configura una pregunta secreta. Si olvidas tu contraseña, podrás recuperarla respondiendo a esta pregunta.
+            <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem' }}>
+              Gestiona el catálogo de experiencias y hospedajes de YouTours Cartagena.
             </p>
-            
-            <div style={{ marginBottom: '1.5rem' }}>
-              <label style={{ display: 'block', marginBottom: '0.5rem', color: 'var(--text-muted)', fontWeight: '500' }}>
-                Pregunta de Seguridad <span style={{ color: '#ef4444' }}>*</span>
-              </label>
-              <select 
-                value={settingsForm.securityQuestion} 
-                onChange={(e) => setSettingsForm({...settingsForm, securityQuestion: e.target.value})}
-                required
-                style={{ width: '100%', padding: '0.8rem', backgroundColor: 'var(--background)', border: '1px solid var(--border)', color: 'var(--text-main)', borderRadius: 'var(--radius-md)' }} 
-              >
-                <option value="" disabled>Selecciona una pregunta de seguridad...</option>
-                <option value="¿En qué ciudad se conocieron tus padres?">¿En qué ciudad se conocieron tus padres?</option>
-                <option value="¿Cuál era el nombre de tu primer colegio?">¿Cuál era el nombre de tu primer colegio?</option>
-                <option value="¿Cuál es el nombre de la ciudad donde naciste?">¿Cuál es el nombre de la ciudad donde naciste?</option>
-                <option value="¿Cuál era el nombre de tu mejor amigo de la infancia?">¿Cuál era el nombre de tu mejor amigo de la infancia?</option>
-                <option value="¿Cuál es el segundo nombre de tu madre?">¿Cuál es el segundo nombre de tu madre?</option>
-                <option value="¿En qué año te graduaste del colegio?">¿En qué año te graduaste del colegio?</option>
-                <option value="¿Cuál fue tu primer vehículo u objeto preciado?">¿Cuál fue tu primer vehículo u objeto preciado?</option>
-              </select>
-            </div>
-            <div style={{ marginBottom: '1.5rem' }}>
-              <label style={{ display: 'block', marginBottom: '0.5rem', color: 'var(--text-muted)', fontWeight: '500' }}>
-                Respuesta a la Pregunta {!config.securityQuestion && <span style={{ color: '#ef4444' }}>*</span>}
-              </label>
-              <input 
-                type="password" 
-                placeholder={config.securityQuestion ? "Dejar en blanco para no cambiarla" : "Escribe tu respuesta secreta"}
-                value={settingsForm.securityAnswer} 
-                onChange={(e) => setSettingsForm({...settingsForm, securityAnswer: e.target.value})}
-                required={!config.securityQuestion}
-                style={{ width: '100%', padding: '0.8rem', backgroundColor: 'var(--background)', border: '1px solid var(--border)', color: 'var(--text-main)', borderRadius: 'var(--radius-md)' }} 
-              />
-            </div>
+          </div>
 
-            <hr style={{ borderColor: 'var(--border)', margin: '2rem 0' }} />
-
-            <div style={{ marginBottom: '2rem', backgroundColor: 'rgba(239,68,68,0.05)', padding: '1.5rem', borderRadius: 'var(--radius-md)', border: '1px solid rgba(239,68,68,0.2)' }}>
-              <label style={{ display: 'block', marginBottom: '0.5rem', color: '#ef4444', fontWeight: 'bold' }}>
-                Contraseña Actual (Requerida para guardar) <span style={{ color: '#ef4444' }}>*</span>
-              </label>
-              <input 
-                type="password" 
-                placeholder="Ingresa tu contraseña actual para confirmar los cambios"
-                value={settingsForm.currentPassword} 
-                onChange={(e) => setSettingsForm({...settingsForm, currentPassword: e.target.value})}
-                required
-                style={{ width: '100%', padding: '0.8rem', backgroundColor: 'var(--background)', border: '1px solid rgba(239,68,68,0.4)', color: 'var(--text-main)', borderRadius: 'var(--radius-md)' }} 
-              />
-            </div>
-
-            <button type="submit" className="btn btn-primary" style={{ padding: '1rem 2rem', width: '100%', fontSize: '1.1rem', fontWeight: 'bold' }}>
-              Guardar Configuración
+          <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
+            <Link to="/" className="btn" style={{ backgroundColor: 'var(--surface)', border: '1px solid var(--border)', color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <Eye size={18} /> Ver Sitio Web
+            </Link>
+            <button onClick={handleResetDefaults} className="btn" style={{ backgroundColor: 'var(--surface)', border: '1px solid var(--border)', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <RefreshCw size={16} /> Restaurar Catálogo
             </button>
-          </form>
+            <button onClick={onLogout} className="btn" style={{ backgroundColor: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', border: '1px solid #ef4444', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <LogOut size={18} /> Cerrar Sesión
+            </button>
+          </div>
         </div>
-      )}
 
-      {/* Custom Delete Confirmation Modal */}
-      {deleteModal.isOpen && (
-        <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', backgroundColor: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 10000 }}>
-          <div style={{ backgroundColor: 'var(--surface)', padding: '2.5rem', borderRadius: 'var(--radius-lg)', maxWidth: '450px', width: '90%', boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)', textAlign: 'center', animation: 'slideDown 0.3s ease-out' }}>
-            <div style={{ width: '64px', height: '64px', borderRadius: '50%', backgroundColor: 'rgba(239,68,68,0.1)', color: '#ef4444', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.5rem' }}>
-              <Trash2 size={32} />
+        {notification && (
+          <div style={{ backgroundColor: '#10b981', color: '#fff', padding: '1rem 1.5rem', borderRadius: 'var(--radius-md)', marginBottom: '2rem', fontWeight: 600, boxShadow: 'var(--shadow-md)' }}>
+            {notification}
+          </div>
+        )}
+
+        {/* Tab & Search Bar */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1.5rem', marginBottom: '2rem' }}>
+          <div style={{ display: 'flex', gap: '0.5rem', backgroundColor: 'var(--surface)', padding: '0.3rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border)' }}>
+            <button 
+              onClick={() => setActiveTab('tours')}
+              style={{
+                padding: '0.6rem 1.4rem',
+                borderRadius: 'var(--radius-sm)',
+                border: 'none',
+                cursor: 'pointer',
+                fontWeight: 700,
+                fontSize: '0.95rem',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.5rem',
+                backgroundColor: activeTab === 'tours' ? 'var(--primary)' : 'transparent',
+                color: activeTab === 'tours' ? '#fff' : 'var(--text-muted)',
+                transition: 'all 0.2s'
+              }}
+            >
+              <Compass size={18} /> Tours ({tours.length})
+            </button>
+            <button 
+              onClick={() => setActiveTab('apartments')}
+              style={{
+                padding: '0.6rem 1.4rem',
+                borderRadius: 'var(--radius-sm)',
+                border: 'none',
+                cursor: 'pointer',
+                fontWeight: 700,
+                fontSize: '0.95rem',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.5rem',
+                backgroundColor: activeTab === 'apartments' ? 'var(--primary)' : 'transparent',
+                color: activeTab === 'apartments' ? '#fff' : 'var(--text-muted)',
+                transition: 'all 0.2s'
+              }}
+            >
+              <Building size={18} /> Apartamentos ({apartments.length})
+            </button>
+          </div>
+
+          <div style={{ display: 'flex', gap: '1rem', flex: 1, maxWidth: '500px', justifyContent: 'flex-end' }}>
+            <input 
+              type="text" 
+              placeholder={`Buscar en ${activeTab === 'tours' ? 'tours' : 'apartamentos'}...`}
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              style={{
+                padding: '0.6rem 1rem',
+                borderRadius: 'var(--radius-md)',
+                border: '1px solid var(--border)',
+                backgroundColor: 'var(--surface)',
+                color: 'var(--text-main)',
+                flex: 1
+              }}
+            />
+            <button 
+              onClick={() => navigate(activeTab === 'tours' ? '/admin/tours/new' : '/admin/apartments/new')}
+              className="btn btn-primary"
+              style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.6rem 1.2rem', whiteSpace: 'nowrap' }}
+            >
+              <Plus size={18} /> Crear {activeTab === 'tours' ? 'Tour' : 'Apartamento'}
+            </button>
+          </div>
+        </div>
+
+        {/* Content Table / Cards */}
+        {loading ? (
+          <div style={{ textAlign: 'center', padding: '4rem 0' }}>
+            <h3>Cargando registros...</h3>
+          </div>
+        ) : activeTab === 'tours' ? (
+          <div style={{ backgroundColor: 'var(--surface)', borderRadius: 'var(--radius-lg)', border: '1px solid var(--border)', overflow: 'hidden', boxShadow: 'var(--shadow-md)' }}>
+            <div style={{ overflowX: 'auto' }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+                <thead>
+                  <tr style={{ backgroundColor: 'var(--background)', borderBottom: '1px solid var(--border)', color: 'var(--text-muted)', fontSize: '0.85rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                    <th style={{ padding: '1rem 1.5rem' }}>Experiencia</th>
+                    <th style={{ padding: '1rem' }}>Categoría</th>
+                    <th style={{ padding: '1rem' }}>Precio Adulto</th>
+                    <th style={{ padding: '1rem' }}>Duración</th>
+                    <th style={{ padding: '1rem' }}>Rating</th>
+                    <th style={{ padding: '1rem 1.5rem', textAlign: 'right' }}>Acciones</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredTours.map((tour) => {
+                    const thumb = tour.images && tour.images[0] ? getImageUrl(tour.images[0]) : getImageUrl('/images/ciudad_amurallada.png');
+                    return (
+                      <tr key={tour.id} style={{ borderBottom: '1px solid var(--border)', transition: 'background-color 0.2s' }}>
+                        <td style={{ padding: '1rem 1.5rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                          <img 
+                            src={thumb} 
+                            alt={tour.title} 
+                            style={{ width: '56px', height: '56px', borderRadius: 'var(--radius-md)', objectFit: 'cover' }}
+                            onError={(e) => { e.target.src = getImageUrl('/images/ciudad_amurallada.png'); }}
+                          />
+                          <div>
+                            <div style={{ fontWeight: 700, fontSize: '1rem', color: 'var(--text-main)' }}>{tour.title}</div>
+                            <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', maxWidth: '300px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{tour.shortDescription}</div>
+                          </div>
+                        </td>
+                        <td style={{ padding: '1rem' }}>
+                          <span className="badge badge-accent" style={{ fontSize: '0.8rem' }}>{tour.category}</span>
+                        </td>
+                        <td style={{ padding: '1rem', fontWeight: 700, color: 'var(--primary)' }}>
+                          ${tour.price ? tour.price.toLocaleString('es-CO') : 0} COP
+                        </td>
+                        <td style={{ padding: '1rem', color: 'var(--text-muted)', fontSize: '0.9rem' }}>
+                          {tour.duration}
+                        </td>
+                        <td style={{ padding: '1rem', fontWeight: 600 }}>
+                          ★ {tour.rating || 5.0}
+                        </td>
+                        <td style={{ padding: '1rem 1.5rem', textAlign: 'right' }}>
+                          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.5rem' }}>
+                            <Link to={`/tour/${tour.id}`} target="_blank" className="btn" style={{ padding: '0.4rem 0.6rem', backgroundColor: 'var(--background)', color: 'var(--text-muted)' }} title="Ver en la web">
+                              <Eye size={16} />
+                            </Link>
+                            <Link to={`/admin/tours/${tour.id}`} className="btn btn-primary" style={{ padding: '0.4rem 0.6rem' }} title="Editar tour">
+                              <Edit size={16} />
+                            </Link>
+                            <button 
+                              onClick={() => setDeleteModal({ isOpen: true, type: 'tour', itemId: tour.id, itemTitle: tour.title })}
+                              style={{ padding: '0.4rem 0.6rem', backgroundColor: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', border: '1px solid rgba(239, 68, 68, 0.3)', borderRadius: 'var(--radius-sm)', cursor: 'pointer' }}
+                              title="Eliminar tour"
+                            >
+                              <Trash2 size={16} />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
             </div>
-            <h2 style={{ fontSize: '1.5rem', marginBottom: '1rem', color: 'var(--text-main)' }}>¿Eliminar {deleteModal.type === 'tour' ? 'Tour' : 'Apartamento'}?</h2>
-            <p style={{ color: 'var(--text-muted)', marginBottom: '2rem', fontSize: '1.1rem' }}>
-              Estás a punto de eliminar permanentemente el {deleteModal.type === 'tour' ? 'tour' : 'apartamento'}: <br/>
-              <strong style={{ color: 'var(--text-main)', display: 'block', marginTop: '0.5rem' }}>"{deleteModal.itemTitle}"</strong><br/>
-              Esta acción no se puede deshacer.
+          </div>
+        ) : (
+          <div style={{ backgroundColor: 'var(--surface)', borderRadius: 'var(--radius-lg)', border: '1px solid var(--border)', overflow: 'hidden', boxShadow: 'var(--shadow-md)' }}>
+            <div style={{ overflowX: 'auto' }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+                <thead>
+                  <tr style={{ backgroundColor: 'var(--background)', borderBottom: '1px solid var(--border)', color: 'var(--text-muted)', fontSize: '0.85rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                    <th style={{ padding: '1rem 1.5rem' }}>Apartamento</th>
+                    <th style={{ padding: '1rem' }}>Categoría</th>
+                    <th style={{ padding: '1rem' }}>Precio por Noche</th>
+                    <th style={{ padding: '1rem' }}>Capacidad</th>
+                    <th style={{ padding: '1rem' }}>Rating</th>
+                    <th style={{ padding: '1rem 1.5rem', textAlign: 'right' }}>Acciones</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredApartments.map((apt) => {
+                    const thumb = apt.images && apt.images[0] ? getImageUrl(apt.images[0]) : '';
+                    return (
+                      <tr key={apt.id} style={{ borderBottom: '1px solid var(--border)', transition: 'background-color 0.2s' }}>
+                        <td style={{ padding: '1rem 1.5rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                          <img 
+                            src={thumb} 
+                            alt={apt.title} 
+                            style={{ width: '56px', height: '56px', borderRadius: 'var(--radius-md)', objectFit: 'cover' }}
+                          />
+                          <div>
+                            <div style={{ fontWeight: 700, fontSize: '1rem', color: 'var(--text-main)' }}>{apt.title}</div>
+                            <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', maxWidth: '300px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{apt.shortDescription}</div>
+                          </div>
+                        </td>
+                        <td style={{ padding: '1rem' }}>
+                          <span className="badge badge-accent" style={{ fontSize: '0.8rem' }}>{apt.category}</span>
+                        </td>
+                        <td style={{ padding: '1rem', fontWeight: 700, color: 'var(--primary)' }}>
+                          ${apt.price ? apt.price.toLocaleString('es-CO') : 0} COP
+                        </td>
+                        <td style={{ padding: '1rem', color: 'var(--text-muted)', fontSize: '0.9rem' }}>
+                          {apt.duration}
+                        </td>
+                        <td style={{ padding: '1rem', fontWeight: 600 }}>
+                          ★ {apt.rating || 5.0}
+                        </td>
+                        <td style={{ padding: '1rem 1.5rem', textAlign: 'right' }}>
+                          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.5rem' }}>
+                            <Link to={`/apartamento/${apt.id}`} target="_blank" className="btn" style={{ padding: '0.4rem 0.6rem', backgroundColor: 'var(--background)', color: 'var(--text-muted)' }} title="Ver en la web">
+                              <Eye size={16} />
+                            </Link>
+                            <Link to={`/admin/apartments/${apt.id}`} className="btn btn-primary" style={{ padding: '0.4rem 0.6rem' }} title="Editar apartamento">
+                              <Edit size={16} />
+                            </Link>
+                            <button 
+                              onClick={() => setDeleteModal({ isOpen: true, type: 'apartment', itemId: apt.id, itemTitle: apt.title })}
+                              style={{ padding: '0.4rem 0.6rem', backgroundColor: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', border: '1px solid rgba(239, 68, 68, 0.3)', borderRadius: 'var(--radius-sm)', cursor: 'pointer' }}
+                              title="Eliminar apartamento"
+                            >
+                              <Trash2 size={16} />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+
+      </div>
+
+      {/* Delete Confirmation Modal */}
+      {deleteModal.isOpen && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100%',
+          backgroundColor: 'rgba(0,0,0,0.6)',
+          backdropFilter: 'blur(4px)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 1000
+        }}>
+          <div style={{ backgroundColor: 'var(--surface)', padding: '2rem', borderRadius: 'var(--radius-lg)', maxWidth: '420px', width: '90%', textAlign: 'center' }}>
+            <h3 style={{ fontSize: '1.4rem', marginBottom: '0.75rem' }}>¿Eliminar este elemento?</h3>
+            <p style={{ color: 'var(--text-muted)', marginBottom: '1.5rem', fontSize: '0.95rem' }}>
+              Vas a eliminar <strong>"{deleteModal.itemTitle}"</strong>. Esta acción actualizará el catálogo local de inmediato.
             </p>
             <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
               <button 
                 onClick={() => setDeleteModal({ isOpen: false, type: 'tour', itemId: null, itemTitle: '' })} 
                 className="btn" 
-                style={{ padding: '0.8rem 1.5rem', border: '1px solid var(--border)', flex: 1 }}
+                style={{ backgroundColor: 'var(--background)', color: 'var(--text-main)', border: '1px solid var(--border)' }}
               >
                 Cancelar
               </button>
               <button 
-                onClick={confirmDelete} 
+                onClick={handleDelete} 
                 className="btn" 
-                style={{ padding: '0.8rem 1.5rem', backgroundColor: '#ef4444', color: 'white', border: 'none', flex: 1, fontWeight: 'bold' }}
+                style={{ backgroundColor: '#ef4444', color: '#fff', border: 'none' }}
               >
                 Sí, Eliminar
               </button>
@@ -434,7 +356,6 @@ export default function AdminDashboard({ onLogout }) {
           </div>
         </div>
       )}
-
     </div>
   );
 }
