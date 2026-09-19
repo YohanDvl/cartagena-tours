@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Search, Compass, Shield, ThumbsUp, Building } from 'lucide-react';
+import { Search, Compass, Shield, ThumbsUp, Building, X, ArrowDown } from 'lucide-react';
 import TourCard from '../components/TourCard';
 import ApartmentCard from '../components/ApartmentCard';
 import { store } from '../data/store';
@@ -21,7 +21,7 @@ export default function Home() {
         setTours(toursData);
         setApartments(aptsData);
       } catch (err) {
-        console.error("Error cargando catálogo:", err);
+        console.error('Error cargando catálogo:', err);
       } finally {
         setLoading(false);
       }
@@ -52,6 +52,45 @@ export default function Home() {
     (apt.category && apt.category.toLowerCase().includes(searchTerm.toLowerCase())) ||
     (apt.shortDescription && apt.shortDescription.toLowerCase().includes(searchTerm.toLowerCase()))
   );
+
+  const scrollToResults = (forcedTarget = null) => {
+    const term = searchTerm.toLowerCase().trim();
+
+    let targetId = forcedTarget;
+    if (!targetId) {
+      const isApartmentSearch = 
+        term.includes('apartamento') || 
+        term.includes('apto') || 
+        term.includes('loft') || 
+        term.includes('hospedaje') || 
+        term.includes('alojamiento') || 
+        term.includes('piso') || 
+        term.includes('habitacion') || 
+        term.includes('habitación') || 
+        term.includes('suite') || 
+        term.includes('morros') || 
+        term.includes('bocagrande') || 
+        term.includes('penthouse');
+
+      if (isApartmentSearch || (filteredTours.length === 0 && filteredApartments.length > 0)) {
+        targetId = 'apartments';
+      } else {
+        targetId = 'tours';
+      }
+    }
+
+    const element = document.getElementById(targetId);
+    if (element) {
+      const yOffset = -85; // Altura de navbar fija
+      const y = element.getBoundingClientRect().top + window.pageYOffset + yOffset;
+      window.scrollTo({ top: y, behavior: 'smooth' });
+    }
+  };
+
+  const handleSearchSubmit = (e) => {
+    if (e) e.preventDefault();
+    scrollToResults();
+  };
 
   return (
     <div>
@@ -146,49 +185,185 @@ export default function Home() {
             Tours exclusivos, alquiler de botes deportivos y apartamentos vacacionales con atención VIP personalizada en Cartagena.
           </p>
           
-          {/* Search Bar */}
-          <div style={{
-            maxWidth: '650px',
-            margin: '0 auto',
-            position: 'relative',
-            boxShadow: 'var(--shadow-xl)',
-            borderRadius: 'var(--radius-full)'
-          }}>
-            <input 
-              type="text" 
-              placeholder="¿Qué experiencia o alojamiento buscas? (Ej: Islas del Rosario, Catamarán, Loft...)"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              style={{
-                width: '100%',
-                padding: '1.2rem 3.5rem 1.2rem 2rem',
-                borderRadius: 'var(--radius-full)',
-                border: '2px solid rgba(255,255,255,0.3)',
-                backgroundColor: 'rgba(255, 255, 255, 0.95)',
-                color: 'var(--text-main)',
-                fontSize: '1rem',
-                outline: 'none',
-                backdropFilter: 'blur(8px)',
-                boxShadow: '0 8px 30px rgba(0,0,0,0.2)'
-              }}
-            />
+          {/* Search Bar Form */}
+          <form 
+            onSubmit={handleSearchSubmit}
+            style={{
+              maxWidth: '680px',
+              margin: '0 auto',
+              position: 'relative'
+            }}
+          >
             <div style={{
-              position: 'absolute',
-              right: '8px',
-              top: '50%',
-              transform: 'translateY(-50%)',
-              backgroundColor: 'var(--primary)',
-              color: '#fff',
-              borderRadius: '50%',
-              width: '42px',
-              height: '42px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center'
+              position: 'relative',
+              boxShadow: '0 12px 35px rgba(0,0,0,0.3)',
+              borderRadius: 'var(--radius-full)'
             }}>
-              <Search size={20} />
+              <input 
+                type="text" 
+                placeholder="¿Qué experiencia o alojamiento buscas? (Ej: Islas del Rosario, Loft...)"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                style={{
+                  width: '100%',
+                  padding: searchTerm ? '1.2rem 6.5rem 1.2rem 2rem' : '1.2rem 4rem 1.2rem 2rem',
+                  borderRadius: 'var(--radius-full)',
+                  border: '2px solid rgba(255,255,255,0.4)',
+                  backgroundColor: 'rgba(255, 255, 255, 0.96)',
+                  color: 'var(--text-main)',
+                  fontSize: '1.05rem',
+                  outline: 'none',
+                  backdropFilter: 'blur(8px)',
+                  boxShadow: '0 8px 30px rgba(0,0,0,0.25)',
+                  transition: 'all 0.2s ease'
+                }}
+              />
+
+              {/* Botón limpiar búsqueda */}
+              {searchTerm && (
+                <button
+                  type="button"
+                  onClick={() => setSearchTerm('')}
+                  style={{
+                    position: 'absolute',
+                    right: '58px',
+                    top: '50%',
+                    transform: 'translateY(-50%)',
+                    background: 'rgba(15, 23, 42, 0.08)',
+                    border: 'none',
+                    borderRadius: '50%',
+                    width: '32px',
+                    height: '32px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    cursor: 'pointer',
+                    color: '#64748b',
+                    transition: 'all 0.2s'
+                  }}
+                  title="Borrar búsqueda"
+                >
+                  <X size={16} />
+                </button>
+              )}
+
+              {/* Botón enviar búsqueda */}
+              <button 
+                type="submit"
+                style={{
+                  position: 'absolute',
+                  right: '8px',
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  backgroundColor: 'var(--primary)',
+                  color: '#fff',
+                  borderRadius: '50%',
+                  width: '46px',
+                  height: '46px',
+                  border: 'none',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  cursor: 'pointer',
+                  boxShadow: '0 4px 14px rgba(245, 158, 11, 0.4)',
+                  transition: 'transform 0.2s, background-color 0.2s'
+                }}
+                onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-50%) scale(1.08)'}
+                onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(-50%) scale(1)'}
+                title="Buscar y ver resultados"
+              >
+                <Search size={22} />
+              </button>
             </div>
-          </div>
+
+            {/* Live feedback pill when user is typing */}
+            {searchTerm.trim().length > 0 && (
+              <div style={{ marginTop: '1rem', display: 'flex', justifyContent: 'center' }}>
+                <button
+                  type="button"
+                  onClick={() => scrollToResults()}
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '0.6rem',
+                    backgroundColor: 'rgba(15, 23, 42, 0.9)',
+                    backdropFilter: 'blur(10px)',
+                    color: '#ffffff',
+                    padding: '0.6rem 1.4rem',
+                    borderRadius: '9999px',
+                    border: '1px solid rgba(251, 191, 36, 0.6)',
+                    cursor: 'pointer',
+                    fontSize: '0.92rem',
+                    fontWeight: 600,
+                    boxShadow: '0 8px 25px rgba(0,0,0,0.35)',
+                    transition: 'all 0.2s ease'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.transform = 'translateY(-2px)';
+                    e.currentTarget.style.backgroundColor = '#0f172a';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = 'translateY(0)';
+                    e.currentTarget.style.backgroundColor = 'rgba(15, 23, 42, 0.9)';
+                  }}
+                >
+                  <span>
+                    {filteredTours.length + filteredApartments.length > 0
+                      ? `✨ ${filteredTours.length + filteredApartments.length} resultado(s) (${filteredTours.length} tours, ${filteredApartments.length} alojamientos) — Ver abajo`
+                      : '🔍 Ver catálogo de experiencias'}
+                  </span>
+                  <ArrowDown size={16} color="#fbbf24" />
+                </button>
+              </div>
+            )}
+
+            {/* Accesos rápidos populares si no hay búsqueda activa */}
+            {searchTerm === '' && (
+              <div style={{ marginTop: '1.2rem', display: 'flex', justifyContent: 'center', gap: '0.6rem', flexWrap: 'wrap' }}>
+                <span style={{ fontSize: '0.85rem', color: 'rgba(255,255,255,0.85)', alignSelf: 'center', marginRight: '0.2rem', textShadow: '0 1px 4px rgba(0,0,0,0.8)' }}>
+                  Búsquedas sugeridas:
+                </span>
+                {[
+                  { label: '🏢 Apartamentos', term: 'apartamento', target: 'apartments' },
+                  { label: '🏝️ Islas del Rosario', term: 'islas', target: 'tours' },
+                  { label: '⛵ Catamarán & Botes', term: 'catamarán', target: 'tours' },
+                  { label: '🎉 Chiva Rumbera', term: 'chiva', target: 'tours' },
+                ].map((chip) => (
+                  <button
+                    key={chip.term}
+                    type="button"
+                    onClick={() => {
+                      setSearchTerm(chip.term);
+                      setTimeout(() => scrollToResults(chip.target), 60);
+                    }}
+                    style={{
+                      backgroundColor: 'rgba(255,255,255,0.18)',
+                      backdropFilter: 'blur(6px)',
+                      border: '1px solid rgba(255,255,255,0.3)',
+                      color: '#ffffff',
+                      padding: '0.35rem 0.85rem',
+                      borderRadius: '9999px',
+                      fontSize: '0.82rem',
+                      fontWeight: 600,
+                      cursor: 'pointer',
+                      transition: 'all 0.2s',
+                      textShadow: '0 1px 3px rgba(0,0,0,0.5)'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.32)';
+                      e.currentTarget.style.transform = 'translateY(-1px)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.18)';
+                      e.currentTarget.style.transform = 'translateY(0)';
+                    }}
+                  >
+                    {chip.label}
+                  </button>
+                ))}
+              </div>
+            )}
+          </form>
         </div>
       </section>
 
@@ -264,8 +439,30 @@ export default function Home() {
             </div>
           ) : (
             <div style={{ textAlign: 'center', padding: '3rem 0' }}>
-              <p style={{ fontSize: '1.2rem', color: 'var(--text-muted)' }}>No encontramos tours que coincidan con tu búsqueda.</p>
-              <button onClick={() => setSearchTerm('')} className="btn btn-primary" style={{ marginTop: '1rem' }}>Ver todos los tours</button>
+              {filteredApartments.length > 0 ? (
+                <div>
+                  <p style={{ fontSize: '1.25rem', color: 'var(--text-muted)' }}>
+                    No encontramos tours para <strong>"{searchTerm}"</strong>, pero encontramos <strong>{filteredApartments.length} alojamiento{filteredApartments.length > 1 ? 's' : ''}</strong> en la sección siguiente.
+                  </p>
+                  <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', marginTop: '1.2rem', flexWrap: 'wrap' }}>
+                    <button 
+                      onClick={() => scrollToResults('apartments')} 
+                      className="btn btn-primary"
+                      style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}
+                    >
+                      Ver Alojamientos ({filteredApartments.length}) <ArrowDown size={16} />
+                    </button>
+                    <button onClick={() => setSearchTerm('')} className="btn" style={{ border: '1px solid var(--border)', backgroundColor: 'var(--surface)' }}>
+                      Limpiar búsqueda
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <div>
+                  <p style={{ fontSize: '1.2rem', color: 'var(--text-muted)' }}>No encontramos experiencias que coincidan con tu búsqueda.</p>
+                  <button onClick={() => setSearchTerm('')} className="btn btn-primary" style={{ marginTop: '1rem' }}>Ver todas las experiencias</button>
+                </div>
+              )}
             </div>
           )}
         </div>
@@ -294,8 +491,29 @@ export default function Home() {
             </div>
           ) : (
             <div style={{ textAlign: 'center', padding: '3rem 0' }}>
-              <p style={{ fontSize: '1.2rem', color: 'var(--text-muted)' }}>No encontramos alojamientos para tu búsqueda.</p>
-              <button onClick={() => setSearchTerm('')} className="btn btn-primary" style={{ marginTop: '1rem' }}>Ver todos los apartamentos</button>
+              {filteredTours.length > 0 ? (
+                <div>
+                  <p style={{ fontSize: '1.25rem', color: 'var(--text-muted)' }}>
+                    No encontramos alojamientos para <strong>"{searchTerm}"</strong>, pero encontramos <strong>{filteredTours.length} experiencia{filteredTours.length > 1 ? 's' : ''} / tour{filteredTours.length > 1 ? 's' : ''}</strong> disponibles arriba.
+                  </p>
+                  <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', marginTop: '1.2rem', flexWrap: 'wrap' }}>
+                    <button 
+                      onClick={() => scrollToResults('tours')} 
+                      className="btn btn-primary"
+                    >
+                      Ver Tours ({filteredTours.length}) ↑
+                    </button>
+                    <button onClick={() => setSearchTerm('')} className="btn" style={{ border: '1px solid var(--border)', backgroundColor: 'var(--surface)' }}>
+                      Limpiar búsqueda
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <div>
+                  <p style={{ fontSize: '1.2rem', color: 'var(--text-muted)' }}>No encontramos alojamientos para tu búsqueda.</p>
+                  <button onClick={() => setSearchTerm('')} className="btn btn-primary" style={{ marginTop: '1rem' }}>Ver todos los alojamientos</button>
+                </div>
+              )}
             </div>
           )}
         </div>
