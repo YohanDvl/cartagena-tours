@@ -41,38 +41,55 @@ export default function Home() {
     }
   }, [loading]);
 
-  const filteredTours = tours.filter(tour => 
-    tour.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    (tour.category && tour.category.toLowerCase().includes(searchTerm.toLowerCase())) ||
-    (tour.shortDescription && tour.shortDescription.toLowerCase().includes(searchTerm.toLowerCase()))
-  );
-  
-  const filteredApartments = apartments.filter(apt => 
-    apt.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    (apt.category && apt.category.toLowerCase().includes(searchTerm.toLowerCase())) ||
-    (apt.shortDescription && apt.shortDescription.toLowerCase().includes(searchTerm.toLowerCase()))
-  );
+  const normalize = (text) => {
+    return (text || '')
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[̀-ͯ]/g, '');
+  };
+
+  const cleanTerm = normalize(searchTerm).trim();
+
+  // Detección de intención global
+  const isAptIntent = ['apartamento', 'apartamentos', 'apto', 'aptos', 'alojamiento', 'alojamientos', 'hospedaje', 'hospedajes', 'loft', 'lofts', 'estancia', 'estancias', 'penthouse', 'habitacion', 'habitaciones'].some(k => cleanTerm.includes(k));
+  const isTourIntent = ['tour', 'tours', 'paseo', 'paseos', 'excursion', 'excursiones', 'experiencia', 'experiencias', 'bote', 'botes', 'yate', 'yates', 'isla', 'islas', 'catamaran'].some(k => cleanTerm.includes(k));
+
+  const filteredTours = tours.filter(tour => {
+    if (!cleanTerm) return true;
+    if (isTourIntent) return true;
+    if (isAptIntent) return false;
+
+    const words = cleanTerm.split(/\s+/).filter(Boolean);
+    const searchableText = normalize(`${tour.title} ${tour.category || ''} ${tour.shortDescription || ''} ${(tour.includes || []).join(' ')}`);
+
+    return words.every(word => {
+      if (searchableText.includes(word)) return true;
+      if (word.endsWith('s') && word.length > 4 && searchableText.includes(word.slice(0, -1))) return true;
+      if (word.endsWith('es') && word.length > 5 && searchableText.includes(word.slice(0, -2))) return true;
+      return false;
+    });
+  });
+
+  const filteredApartments = apartments.filter(apt => {
+    if (!cleanTerm) return true;
+    if (isAptIntent) return true; // Si busca apartamentos o sinónimos, muestra todos los alojamientos
+    if (isTourIntent) return false;
+
+    const words = cleanTerm.split(/\s+/).filter(Boolean);
+    const searchableText = normalize(`${apt.title} ${apt.category || ''} ${apt.shortDescription || ''} ${(apt.includes || []).join(' ')}`);
+
+    return words.every(word => {
+      if (searchableText.includes(word)) return true;
+      if (word.endsWith('s') && word.length > 4 && searchableText.includes(word.slice(0, -1))) return true;
+      if (word.endsWith('es') && word.length > 5 && searchableText.includes(word.slice(0, -2))) return true;
+      return false;
+    });
+  });
 
   const scrollToResults = (forcedTarget = null) => {
-    const term = searchTerm.toLowerCase().trim();
-
     let targetId = forcedTarget;
     if (!targetId) {
-      const isApartmentSearch = 
-        term.includes('apartamento') || 
-        term.includes('apto') || 
-        term.includes('loft') || 
-        term.includes('hospedaje') || 
-        term.includes('alojamiento') || 
-        term.includes('piso') || 
-        term.includes('habitacion') || 
-        term.includes('habitación') || 
-        term.includes('suite') || 
-        term.includes('morros') || 
-        term.includes('bocagrande') || 
-        term.includes('penthouse');
-
-      if (isApartmentSearch || (filteredTours.length === 0 && filteredApartments.length > 0)) {
+      if (isAptIntent || (filteredTours.length === 0 && filteredApartments.length > 0)) {
         targetId = 'apartments';
       } else {
         targetId = 'tours';
@@ -81,9 +98,7 @@ export default function Home() {
 
     const element = document.getElementById(targetId);
     if (element) {
-      const yOffset = -85; // Altura de navbar fija
-      const y = element.getBoundingClientRect().top + window.pageYOffset + yOffset;
-      window.scrollTo({ top: y, behavior: 'smooth' });
+      element.scrollIntoView({ behavior: 'smooth' });
     }
   };
 
@@ -247,7 +262,7 @@ export default function Home() {
                 </button>
               )}
 
-              {/* Botón enviar búsqueda */}
+              {/* Botón enviar búsqueda (Lupa accionable) */}
               <button 
                 type="submit"
                 style={{
@@ -270,13 +285,13 @@ export default function Home() {
                 }}
                 onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-50%) scale(1.08)'}
                 onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(-50%) scale(1)'}
-                title="Buscar y ver resultados"
+                title="Buscar y bajar a resultados"
               >
                 <Search size={22} />
               </button>
             </div>
 
-            {/* Live feedback pill when user is typing */}
+            {/* Píldora interactiva que muestra resultados en vivo */}
             {searchTerm.trim().length > 0 && (
               <div style={{ marginTop: '1rem', display: 'flex', justifyContent: 'center' }}>
                 <button
@@ -286,16 +301,16 @@ export default function Home() {
                     display: 'inline-flex',
                     alignItems: 'center',
                     gap: '0.6rem',
-                    backgroundColor: 'rgba(15, 23, 42, 0.9)',
+                    backgroundColor: 'rgba(15, 23, 42, 0.92)',
                     backdropFilter: 'blur(10px)',
                     color: '#ffffff',
-                    padding: '0.6rem 1.4rem',
+                    padding: '0.65rem 1.5rem',
                     borderRadius: '9999px',
-                    border: '1px solid rgba(251, 191, 36, 0.6)',
+                    border: '1px solid rgba(251, 191, 36, 0.7)',
                     cursor: 'pointer',
                     fontSize: '0.92rem',
                     fontWeight: 600,
-                    boxShadow: '0 8px 25px rgba(0,0,0,0.35)',
+                    boxShadow: '0 8px 25px rgba(0,0,0,0.4)',
                     transition: 'all 0.2s ease'
                   }}
                   onMouseEnter={(e) => {
@@ -304,27 +319,27 @@ export default function Home() {
                   }}
                   onMouseLeave={(e) => {
                     e.currentTarget.style.transform = 'translateY(0)';
-                    e.currentTarget.style.backgroundColor = 'rgba(15, 23, 42, 0.9)';
+                    e.currentTarget.style.backgroundColor = 'rgba(15, 23, 42, 0.92)';
                   }}
                 >
                   <span>
                     {filteredTours.length + filteredApartments.length > 0
-                      ? `✨ ${filteredTours.length + filteredApartments.length} resultado(s) (${filteredTours.length} tours, ${filteredApartments.length} alojamientos) — Ver abajo`
-                      : '🔍 Ver catálogo de experiencias'}
+                      ? `✨ ${filteredTours.length + filteredApartments.length} encontrado(s) (${filteredTours.length} tours, ${filteredApartments.length} alojamientos) — Ver resultados ↓`
+                      : '🔍 Ver catálogo completo ↓'}
                   </span>
                   <ArrowDown size={16} color="#fbbf24" />
                 </button>
               </div>
             )}
 
-            {/* Accesos rápidos populares si no hay búsqueda activa */}
+            {/* Accesos rápidos sugeridos */}
             {searchTerm === '' && (
               <div style={{ marginTop: '1.2rem', display: 'flex', justifyContent: 'center', gap: '0.6rem', flexWrap: 'wrap' }}>
                 <span style={{ fontSize: '0.85rem', color: 'rgba(255,255,255,0.85)', alignSelf: 'center', marginRight: '0.2rem', textShadow: '0 1px 4px rgba(0,0,0,0.8)' }}>
-                  Búsquedas sugeridas:
+                  Sugerencias:
                 </span>
                 {[
-                  { label: '🏢 Apartamentos', term: 'apartamento', target: 'apartments' },
+                  { label: '🏢 Apartamentos', term: 'apartamentos', target: 'apartments' },
                   { label: '🏝️ Islas del Rosario', term: 'islas', target: 'tours' },
                   { label: '⛵ Catamarán & Botes', term: 'catamarán', target: 'tours' },
                   { label: '🎉 Chiva Rumbera', term: 'chiva', target: 'tours' },
@@ -337,24 +352,24 @@ export default function Home() {
                       setTimeout(() => scrollToResults(chip.target), 60);
                     }}
                     style={{
-                      backgroundColor: 'rgba(255,255,255,0.18)',
+                      backgroundColor: 'rgba(255,255,255,0.2)',
                       backdropFilter: 'blur(6px)',
-                      border: '1px solid rgba(255,255,255,0.3)',
+                      border: '1px solid rgba(255,255,255,0.35)',
                       color: '#ffffff',
-                      padding: '0.35rem 0.85rem',
+                      padding: '0.35rem 0.9rem',
                       borderRadius: '9999px',
                       fontSize: '0.82rem',
                       fontWeight: 600,
                       cursor: 'pointer',
                       transition: 'all 0.2s',
-                      textShadow: '0 1px 3px rgba(0,0,0,0.5)'
+                      textShadow: '0 1px 3px rgba(0,0,0,0.6)'
                     }}
                     onMouseEnter={(e) => {
-                      e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.32)';
+                      e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.35)';
                       e.currentTarget.style.transform = 'translateY(-1px)';
                     }}
                     onMouseLeave={(e) => {
-                      e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.18)';
+                      e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.2)';
                       e.currentTarget.style.transform = 'translateY(0)';
                     }}
                   >

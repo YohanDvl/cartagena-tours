@@ -5,7 +5,6 @@ export default function CookieBanner() {
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
-    // 1. Show automatically if not accepted yet
     const cookiesAccepted = localStorage.getItem('cookiesAccepted');
     if (!cookiesAccepted) {
       const timer = setTimeout(() => {
@@ -16,14 +15,12 @@ export default function CookieBanner() {
   }, []);
 
   useEffect(() => {
-    // 2. ALWAYS listen for the custom event to show banner again
     const showBanner = () => {
       setIsVisible(true);
-      // Give it a little "look at me" effect
       const banner = document.querySelector('.cookie-banner-box');
       if (banner) {
-        banner.classList.add('shake-animation');
-        setTimeout(() => banner.classList.remove('shake-animation'), 500);
+        banner.classList.add('shake-mini');
+        setTimeout(() => banner.classList.remove('shake-mini'), 400);
       }
     };
     
@@ -39,82 +36,93 @@ export default function CookieBanner() {
   if (!isVisible) return null;
 
   return (
-    <div style={{
-      position: 'fixed',
-      bottom: '1rem',
-      left: '1rem',
-      right: '1rem',
-      maxWidth: '500px',
-      backgroundColor: 'rgba(25, 25, 25, 0.95)',
-      backdropFilter: 'blur(10px)',
-      border: '1px solid var(--border)',
-      borderRadius: 'var(--radius-lg)',
-      padding: '1.5rem',
-      zIndex: 10000,
-      display: 'flex',
-      flexDirection: 'column',
-      gap: '1rem',
-      boxShadow: '0 10px 30px rgba(0,0,0,0.5)',
-      margin: '0 auto',
-    }} className="animate-fade-in cookie-banner-box">
-      <div style={{ display: 'flex', gap: '1rem', alignItems: 'flex-start' }}>
-        <div style={{ fontSize: '1.5rem' }}>🍪</div>
-        <div style={{ flex: 1 }}>
-          <h4 style={{ color: 'white', marginBottom: '0.25rem', fontSize: '1.1rem' }}>Aviso de Cookies y Privacidad</h4>
-          <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', lineHeight: 1.5, marginBottom: '0.5rem' }}>
-            Usamos cookies para mejorar tu experiencia. Al continuar navegando, aceptas nuestra <Link to="/politica-de-privacidad" style={{ color: 'var(--primary)', textDecoration: 'underline' }}>Política de Privacidad</Link>.
-          </p>
-          <p style={{ color: 'var(--primary)', fontSize: '0.75rem', fontWeight: 700, fontStyle: 'italic' }}>
-            ⚠️ Es obligatorio aceptar para habilitar el contacto por WhatsApp y reservas.
-          </p>
-        </div>
+    <aside 
+      role="dialog" 
+      aria-label="Aviso de cookies"
+      className="cookie-banner-box"
+      style={{
+        position: 'fixed',
+        bottom: '12px',
+        left: '12px',
+        right: '12px',
+        maxWidth: '480px',
+        margin: '0 auto',
+        backgroundColor: 'rgba(20, 24, 30, 0.96)',
+        backdropFilter: 'blur(10px)',
+        WebkitBackdropFilter: 'blur(10px)',
+        border: '1px solid rgba(255, 255, 255, 0.15)',
+        borderRadius: '14px',
+        padding: '0.65rem 0.9rem',
+        zIndex: 10000,
+        boxShadow: '0 8px 24px rgba(0, 0, 0, 0.45)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        gap: '0.75rem'
+      }}
+    >
+      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flex: 1, minWidth: 0 }}>
+        <span style={{ fontSize: '1.2rem', lineHeight: 1 }}>🍪</span>
+        <p style={{ margin: 0, color: 'rgba(255, 255, 255, 0.88)', fontSize: '0.78rem', lineHeight: 1.3 }}>
+          Usamos cookies para tu experiencia. Ver{' '}
+          <Link to="/politica-de-privacidad" style={{ color: '#f97316', textDecoration: 'underline' }}>
+            Privacidad
+          </Link>.
+        </p>
       </div>
-      <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'flex-end' }}>
+
+      <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', flexShrink: 0 }}>
         <button 
           onClick={() => setIsVisible(false)}
+          type="button"
           style={{ 
-            backgroundColor: 'transparent', 
-            color: 'var(--text-muted)', 
-            border: '1px solid var(--border)', 
-            padding: '0.5rem 1rem', 
-            borderRadius: 'var(--radius-md)',
-            fontSize: '0.85rem',
+            background: 'transparent', 
+            color: 'rgba(255, 255, 255, 0.6)', 
+            border: 'none',
+            padding: '0.35rem 0.6rem', 
+            fontSize: '0.75rem',
             cursor: 'pointer'
           }}
         >
-          Rechazar
+          Cerrar
         </button>
         <button 
           onClick={acceptCookies}
-          className="btn btn-primary" 
-          style={{ padding: '0.5rem 1.5rem', fontSize: '0.85rem' }}
+          type="button"
+          style={{ 
+            backgroundColor: '#f97316', 
+            color: '#ffffff', 
+            border: 'none',
+            padding: '0.4rem 0.85rem', 
+            borderRadius: '9999px',
+            fontSize: '0.78rem',
+            fontWeight: 600,
+            cursor: 'pointer',
+            boxShadow: '0 2px 6px rgba(249, 115, 22, 0.35)'
+          }}
         >
-          Aceptar y habilitar contacto
+          Aceptar
         </button>
       </div>
+
       <style>{`
-        @media (max-width: 600px) {
-          div {
-            bottom: 0 !important;
-            left: 0 !important;
-            right: 0 !important;
-            width: 100% !important;
-            max-width: 100% !important;
-            border-radius: 20px 20px 0 0 !important;
-          }
+        .cookie-banner-box {
+          animation: slideUpCookie 0.3s ease-out;
         }
-        .shake-animation {
-          animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
-          transform: translate3d(0, 0, 0);
-          border: 2px solid var(--primary) !important;
+        @keyframes slideUpCookie {
+          from { transform: translateY(20px); opacity: 0; }
+          to { transform: translateY(0); opacity: 1; }
         }
-        @keyframes shake {
-          10%, 90% { transform: translate3d(-1px, 0, 0); }
-          20%, 80% { transform: translate3d(2px, 0, 0); }
-          30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
-          40%, 60% { transform: translate3d(4px, 0, 0); }
+        .shake-mini {
+          animation: shakeMini 0.4s ease;
+          border-color: #f97316 !important;
+        }
+        @keyframes shakeMini {
+          0%, 100% { transform: translateX(0); }
+          25% { transform: translateX(-4px); }
+          75% { transform: translateX(4px); }
         }
       `}</style>
-    </div>
+    </aside>
   );
 }
