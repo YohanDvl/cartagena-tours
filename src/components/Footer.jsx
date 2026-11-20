@@ -37,9 +37,9 @@ export default function Footer() {
           <h4 style={{ fontSize: '1.2rem', marginBottom: '1.2rem', color: 'var(--text-main)' }}>Enlaces Rápidos</h4>
           <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
             <li><Link to="/" style={{ color: 'var(--text-muted)' }} className="hover-primary">Inicio</Link></li>
-            <li><a href="#tours" style={{ color: 'var(--text-muted)' }} className="hover-primary">Nuestros Tours & Botes</a></li>
-            <li><a href="#apartments" style={{ color: 'var(--text-muted)' }} className="hover-primary">Apartamentos Turísticos</a></li>
-            <li><a href="#about" style={{ color: 'var(--text-muted)' }} className="hover-primary">Sobre YouTours</a></li>
+            <li><a href="/#tours" style={{ color: 'var(--text-muted)' }} className="hover-primary">Nuestros Tours & Botes</a></li>
+            <li><a href="/#apartments" style={{ color: 'var(--text-muted)' }} className="hover-primary">Apartamentos Turísticos</a></li>
+            <li><a href="/#about" style={{ color: 'var(--text-muted)' }} className="hover-primary">Sobre YouTours</a></li>
             
           </ul>
         </div>

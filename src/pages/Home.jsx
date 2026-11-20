@@ -3,6 +3,7 @@ import { Search, Compass, Shield, ThumbsUp, Building, X, ArrowDown } from 'lucid
 import TourCard from '../components/TourCard';
 import ApartmentCard from '../components/ApartmentCard';
 import { store } from '../data/store';
+import Seo from '../components/Seo';
 import { getImageUrl } from '../utils/imageUrl';
 
 export default function Home() {
@@ -109,6 +110,7 @@ export default function Home() {
 
   return (
     <div>
+      <Seo path="/" description="Tours en Cartagena de Indias: Islas del Rosario, botes privados, Chiva Rumbera, Ciudad Amurallada y apartamentos turísticos. Reserva directa por WhatsApp con YouTours." />
       {/* Hero Section */}
       <section id="home" style={{
         position: 'relative',

@@ -5,7 +5,7 @@ export function getImageUrl(src) {
     return src;
   }
   const clean = src.startsWith('/') ? src.slice(1) : src;
-  const base = import.meta.env.BASE_URL || './';
+  const base = import.meta.env.BASE_URL || '/';
   if (base.endsWith('/')) {
     return `${base}${clean}`;
   }

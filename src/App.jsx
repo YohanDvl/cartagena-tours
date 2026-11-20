@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, lazy, Suspense } from 'react';
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
@@ -7,17 +7,18 @@ import TourDetails from './pages/TourDetails';
 import ApartmentDetails from './pages/ApartmentDetails';
 import TermsAndConditions from './pages/TermsAndConditions';
 import PrivacyPolicy from './pages/PrivacyPolicy';
-import AdminDashboard from './pages/AdminDashboard';
-import AdminTourForm from './pages/AdminTourForm';
-import AdminApartmentForm from './pages/AdminApartmentForm';
-import AdminLogin from './pages/AdminLogin';
+const AdminDashboard = lazy(() => import('./pages/AdminDashboard'));
+const AdminTourForm = lazy(() => import('./pages/AdminTourForm'));
+const AdminApartmentForm = lazy(() => import('./pages/AdminApartmentForm'));
+const AdminLogin = lazy(() => import('./pages/AdminLogin'));
 import WhatsAppButton from './components/WhatsAppButton';
 import CookieBanner from './components/CookieBanner';
+import Seo from './components/Seo';
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(!!localStorage.getItem('admin_token'));
   const location = useLocation();
-  const isAdminRoute = location.pathname.startsWith('/admin') || location.hash.includes('/admin');
+  const isAdminRoute = location.pathname.startsWith('/admin');
 
   const handleLogout = () => {
     localStorage.removeItem('admin_token');
@@ -26,8 +27,10 @@ function App() {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+      {isAdminRoute && <Seo title="Panel administrativo" path={location.pathname} noindex />}
       {!isAdminRoute && <Navbar />}
       <main style={{ flex: 1 }}>
+        <Suspense fallback={<div style={{ padding: '4rem', textAlign: 'center' }}>Cargando…</div>}>
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/tour/:id" element={<TourDetails />} />
@@ -41,6 +44,7 @@ function App() {
           <Route path="/admin/tours/:id" element={isAuthenticated ? <AdminTourForm /> : <Navigate to="/admin/login" />} />
           <Route path="/admin/apartments/:id" element={isAuthenticated ? <AdminApartmentForm /> : <Navigate to="/admin/login" />} />
         </Routes>
+        </Suspense>
       </main>
       {!isAdminRoute && <Footer />}
       {!isAdminRoute && <WhatsAppButton />}

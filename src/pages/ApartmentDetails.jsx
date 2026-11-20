@@ -4,6 +4,7 @@ import { ArrowLeft, MapPin, CheckCircle2, Check, CalendarDays, Shield, Star, Use
 import ApartmentBookingModal from '../components/ApartmentBookingModal';
 import { store } from '../data/store';
 import { getImageUrl } from '../utils/imageUrl';
+import Seo from '../components/Seo';
 
 export default function ApartmentDetails() {
   const { id } = useParams();
@@ -56,6 +57,23 @@ export default function ApartmentDetails() {
 
   return (
     <div style={{ backgroundColor: 'var(--background)', paddingBottom: '4rem' }}>
+      <Seo
+        title={apartment.title}
+        description={apartment.shortDescription}
+        path={`/apartamento/${apartment.id}`}
+        image={images[0]}
+        jsonLd={{
+          "@context": "https://schema.org",
+          "@type": "LodgingBusiness",
+          name: apartment.title,
+          description: apartment.fullDescription || apartment.shortDescription,
+          image: images.map((img) => (img.startsWith("http") ? img : `https://youtourscartagena.vercel.app${img.startsWith("/") ? "" : "/"}${img}`)),
+          url: `https://youtourscartagena.vercel.app/apartamento/${apartment.id}`,
+          address: { "@type": "PostalAddress", addressLocality: "Cartagena de Indias", addressRegion: "Bolívar", addressCountry: "CO" },
+          telephone: "+573015147536",
+          priceRange: `Desde $${Number(apartment.price || 0).toLocaleString("es-CO")} COP por noche`
+        }}
+      />
       {/* Header Carousel */}
       <div style={{ position: 'relative', height: '60vh', minHeight: '400px', overflow: 'hidden' }}>
         {images.map((img, idx) => (

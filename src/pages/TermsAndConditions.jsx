@@ -1,5 +1,6 @@
 import { ArrowLeft } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import Seo from '../components/Seo';
 import { useEffect } from 'react';
 
 export default function TermsAndConditions() {
@@ -9,6 +10,7 @@ export default function TermsAndConditions() {
 
   return (
     <div style={{ backgroundColor: 'var(--background)', color: 'var(--text-main)', minHeight: '100vh', paddingTop: '8rem', paddingBottom: '4rem' }}>
+      <Seo title="Términos y Condiciones" description="Términos y condiciones de reserva de tours y apartamentos turísticos con YouTours Cartagena." path="/terminos-y-condiciones" />
       <div className="container" style={{ maxWidth: '800px' }}>
         <Link to="/" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', color: 'var(--primary)', marginBottom: '2rem', textDecoration: 'none', fontWeight: 600 }}>
           <ArrowLeft size={20} />

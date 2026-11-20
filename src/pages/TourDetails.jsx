@@ -4,6 +4,7 @@ import { ArrowLeft, Clock, MapPin, CheckCircle2, Check, CalendarDays, Shield, St
 import BookingModal from '../components/BookingModal';
 import { store } from '../data/store';
 import { getImageUrl } from '../utils/imageUrl';
+import Seo from '../components/Seo';
 
 export default function TourDetails() {
   const { id } = useParams();
@@ -56,6 +57,22 @@ export default function TourDetails() {
 
   return (
     <div style={{ backgroundColor: 'var(--background)', paddingBottom: '4rem' }}>
+      <Seo
+        title={tour.title}
+        description={tour.shortDescription}
+        path={`/tour/${tour.id}`}
+        image={images[0]}
+        jsonLd={{
+          "@context": "https://schema.org",
+          "@type": "TouristTrip",
+          name: tour.title,
+          description: tour.fullDescription || tour.shortDescription,
+          image: images.map((img) => (img.startsWith("http") ? img : `https://youtourscartagena.vercel.app${img.startsWith("/") ? "" : "/"}${img}`)),
+          url: `https://youtourscartagena.vercel.app/tour/${tour.id}`,
+          provider: { "@id": "https://youtourscartagena.vercel.app/#agency" },
+          offers: { "@type": "Offer", price: tour.price, priceCurrency: "COP", availability: "https://schema.org/InStock", url: `https://youtourscartagena.vercel.app/tour/${tour.id}` }
+        }}
+      />
       {/* Header Image Carousel */}
       <div style={{ position: 'relative', height: '60vh', minHeight: '400px', overflow: 'hidden' }}>
         {images.map((img, idx) => (
