@@ -76,11 +76,10 @@ export default function TourDetails() {
       />
       {/* Header Image Carousel */}
       <div style={{ position: 'relative', height: '60vh', minHeight: '400px', overflow: 'hidden' }}>
-        {images.map((img, idx) => (
+        {images.map((img, idx) => idx > currentImageIndex + 1 ? null : (
           <img 
             key={idx}
             src={getImageUrl(img)} 
-            loading={idx === 0 ? 'eager' : 'lazy'}
             decoding="async"
             alt={`${tour.title} ${idx + 1}`} 
             style={{ 

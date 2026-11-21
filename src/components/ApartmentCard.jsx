@@ -2,18 +2,23 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Users, ChevronLeft, ChevronRight, Star, Flame } from 'lucide-react';
 import { getImageUrl } from '../utils/imageUrl';
+import { useInView } from '../utils/useInView';
 
 export default function ApartmentCard({ apartment }) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const images = apartment.images && apartment.images.length > 0 ? apartment.images : (apartment.image ? [apartment.image] : []);
 
+  // Las fotos se piden cuando la tarjeta se acerca a la pantalla, y solo
+  // la actual y la siguiente del carrusel.
+  const [cardRef, inView] = useInView();
+
   useEffect(() => {
-    if (images.length <= 1) return;
+    if (!inView || images.length <= 1) return;
     const interval = setInterval(() => {
       setCurrentImageIndex((prev) => (prev + 1) % images.length);
     }, 4000);
     return () => clearInterval(interval);
-  }, [images.length]);
+  }, [images.length, inView]);
 
   const nextImage = (e) => {
     e.preventDefault();
@@ -41,12 +46,11 @@ export default function ApartmentCard({ apartment }) {
         height: '100%'
       }}
     >
-      <div style={{ position: 'relative', height: '230px', overflow: 'hidden' }} className="image-container">
-        {images.map((img, idx) => (
+      <div ref={cardRef} style={{ position: 'relative', height: '230px', overflow: 'hidden', backgroundColor: '#dbe4ea' }} className="image-container">
+        {inView && images.map((img, idx) => idx > currentImageIndex + 1 ? null : (
           <img 
             key={idx}
             src={getImageUrl(img)} 
-            loading="lazy"
             decoding="async"
             alt={`${apartment.title} ${idx + 1}`} 
             style={{ 
