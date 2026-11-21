@@ -1,4 +1,4 @@
-import { useState, lazy, Suspense } from 'react';
+import { useState, useEffect, lazy, Suspense } from 'react';
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
@@ -14,6 +14,7 @@ const AdminLogin = lazy(() => import('./pages/AdminLogin'));
 import WhatsAppButton from './components/WhatsAppButton';
 import CookieBanner from './components/CookieBanner';
 import Seo from './components/Seo';
+import { store } from './data/store';
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(!!localStorage.getItem('admin_token'));
@@ -21,9 +22,16 @@ function App() {
   const isAdminRoute = location.pathname.startsWith('/admin');
 
   const handleLogout = () => {
-    localStorage.removeItem('admin_token');
+    store.logout();
     setIsAuthenticated(false);
   };
+
+  // Si el servidor rechaza la sesión (expirada), volvemos al login.
+  useEffect(() => {
+    const onExpired = () => setIsAuthenticated(false);
+    window.addEventListener('admin-logout', onExpired);
+    return () => window.removeEventListener('admin-logout', onExpired);
+  }, []);
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>

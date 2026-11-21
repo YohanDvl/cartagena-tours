@@ -11,6 +11,7 @@ export default function AdminDashboard({ onLogout }) {
   const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(true);
   const [notification, setNotification] = useState('');
+  const [storage, setStorage] = useState('blob');
   const [deleteModal, setDeleteModal] = useState({ isOpen: false, type: 'tour', itemId: null, itemTitle: '' });
   const navigate = useNavigate();
 
@@ -22,11 +23,12 @@ export default function AdminDashboard({ onLogout }) {
     setLoading(true);
     try {
       const [toursData, aptsData] = await Promise.all([
-        store.getTours(),
-        store.getApartments()
+        store.getTours({ fresh: true }),
+        store.getApartments({ fresh: true })
       ]);
       setTours(toursData);
       setApartments(aptsData);
+      setStorage(await store.getStorageStatus());
     } catch (e) {
       console.error(e);
     } finally {
@@ -41,22 +43,30 @@ export default function AdminDashboard({ onLogout }) {
 
   const handleDelete = async () => {
     if (!deleteModal.itemId) return;
-    if (deleteModal.type === 'tour') {
-      await store.deleteTour(deleteModal.itemId);
-      showNotification(`Tour "${deleteModal.itemTitle}" eliminado con éxito.`);
-    } else {
-      await store.deleteApartment(deleteModal.itemId);
-      showNotification(`Apartamento "${deleteModal.itemTitle}" eliminado con éxito.`);
+    try {
+      if (deleteModal.type === 'tour') {
+        await store.deleteTour(deleteModal.itemId);
+        showNotification(`Tour "${deleteModal.itemTitle}" eliminado con éxito.`);
+      } else {
+        await store.deleteApartment(deleteModal.itemId);
+        showNotification(`Apartamento "${deleteModal.itemTitle}" eliminado con éxito.`);
+      }
+    } catch (err) {
+      showNotification(`No se pudo eliminar: ${err.message}`);
     }
     setDeleteModal({ isOpen: false, type: 'tour', itemId: null, itemTitle: '' });
     loadAll();
   };
 
-  const handleResetDefaults = () => {
-    if (window.confirm('¿Restaurar los tours y apartamentos a sus datos originales?')) {
-      store.resetDefaults();
-      loadAll();
-      showNotification('Catálogo restaurado a valores iniciales.');
+  const handleResetDefaults = async () => {
+    if (window.confirm('¿Restaurar los tours y apartamentos a sus datos originales? Se perderán los cambios publicados.')) {
+      try {
+        await store.resetDefaults();
+        loadAll();
+        showNotification('Catálogo restaurado a valores iniciales.');
+      } catch (err) {
+        showNotification(`No se pudo restaurar: ${err.message}`);
+      }
     }
   };
 
@@ -167,6 +177,12 @@ export default function AdminDashboard({ onLogout }) {
             Administra precios, descripciones, itinerarios y fotografías de tours y apartamentos.
           </p>
         </div>
+
+        {storage !== 'blob' && (
+          <div role="alert" style={{ backgroundColor: 'rgba(234, 179, 8, 0.12)', border: '1px solid #eab308', color: 'var(--text-main)', padding: '1rem', borderRadius: 'var(--radius-md)', marginBottom: '1.5rem', fontSize: '0.9rem' }}>
+            <b>El almacenamiento no está conectado.</b> Los cambios no se pueden guardar hasta conectar Vercel Blob al proyecto (Vercel → Storage).
+          </div>
+        )}
 
         {notification && (
           <div style={{ backgroundColor: '#10b981', color: '#fff', padding: '0.9rem 1.4rem', borderRadius: 'var(--radius-md)', marginBottom: '1.5rem', fontWeight: 600, boxShadow: 'var(--shadow-md)' }}>

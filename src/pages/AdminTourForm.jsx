@@ -27,6 +27,9 @@ export default function AdminTourForm() {
   const [notIncludes, setNotIncludes] = useState([]);
   const [itinerary, setItinerary] = useState([]);
   const [loading, setLoading] = useState(!isNew);
+  const [uploading, setUploading] = useState(0);
+  const [saving, setSaving] = useState(false);
+  const [formError, setFormError] = useState('');
 
   useEffect(() => {
     if (!isNew) {
@@ -66,17 +69,22 @@ export default function AdminTourForm() {
     setFormData(prev => ({ ...prev, [field]: formatted }));
   };
 
-  const handleImageUpload = (e) => {
+  const handleImageUpload = async (e) => {
     const files = Array.from(e.target.files);
-    if (!files.length) return;
-    for (const file of files) {
-      const reader = new FileReader();
-      reader.onload = (evt) => {
-        setImages(prev => [...prev, evt.target.result]);
-      };
-      reader.readAsDataURL(file);
-    }
     if (fileInputRef.current) fileInputRef.current.value = '';
+    if (!files.length) return;
+    setFormError('');
+    setUploading(files.length);
+    for (const file of files) {
+      try {
+        const url = await store.uploadImage(file);
+        setImages(prev => [...prev, url]);
+      } catch (err) {
+        setFormError(err.message);
+      } finally {
+        setUploading(n => n - 1);
+      }
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -97,8 +105,16 @@ export default function AdminTourForm() {
       itinerary: itinerary.filter(i => i.time || i.description)
     };
 
-    await store.saveTour(tourData);
-    navigate('/admin');
+    setSaving(true);
+    setFormError('');
+    try {
+      await store.saveTour(tourData);
+      navigate('/admin');
+    } catch (err) {
+      setFormError(`No se pudo guardar: ${err.message}`);
+    } finally {
+      setSaving(false);
+    }
   };
 
   if (loading) {
@@ -121,6 +137,11 @@ export default function AdminTourForm() {
         </div>
 
         <form onSubmit={handleSubmit} style={{ backgroundColor: 'var(--surface)', padding: '2.5rem', borderRadius: 'var(--radius-xl)', boxShadow: 'var(--shadow-lg)', border: '1px solid var(--border)', display: 'flex', flexDirection: 'column', gap: '1.8rem' }}>
+          {formError && (
+            <div role="alert" style={{ backgroundColor: 'rgba(239, 68, 68, 0.1)', border: '1px solid #ef4444', color: '#ef4444', padding: '0.8rem 1rem', borderRadius: 'var(--radius-md)', fontSize: '0.9rem' }}>
+              {formError}
+            </div>
+          )}
           
           <div>
             <label style={{ display: 'block', fontWeight: 700, marginBottom: '0.4rem' }}>Título de la Experiencia</label>
@@ -259,7 +280,7 @@ export default function AdminTourForm() {
                 className="btn" 
                 style={{ backgroundColor: 'var(--background)', border: '1px solid var(--border)', color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}
               >
-                <ImageIcon size={18} /> Subir Imágenes
+                <ImageIcon size={18} /> {uploading > 0 ? `Subiendo (${uploading})…` : 'Subir Imágenes'}
               </button>
             </div>
           </div>
@@ -306,8 +327,8 @@ export default function AdminTourForm() {
             <Link to="/admin" className="btn" style={{ backgroundColor: 'var(--background)', border: '1px solid var(--border)', color: 'var(--text-main)' }}>
               Cancelar
             </Link>
-            <button type="submit" className="btn btn-primary" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.8rem 1.8rem' }}>
-              <Save size={18} /> Guardar Tour
+            <button type="submit" disabled={saving || uploading > 0} className="btn btn-primary" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.8rem 1.8rem', opacity: saving || uploading > 0 ? 0.6 : 1 }}>
+              <Save size={18} /> {saving ? 'Guardando…' : 'Guardar Tour'}
             </button>
           </div>
 

@@ -1,173 +1,157 @@
 import { defaultTours, defaultApartments } from './defaultData';
 
-const TOURS_KEY = 'cartagena_tours_data';
-const APTS_KEY = 'cartagena_apartments_data';
+// El catálogo vive en el servidor (Vercel Blob) y es el mismo para todos los
+// visitantes. Este módulo lo lee y, en el panel admin, lo guarda.
 
-// Initialize localStorage if empty
-function initStorage() {
-  try {
-    if (!localStorage.getItem(TOURS_KEY)) {
-      localStorage.setItem(TOURS_KEY, JSON.stringify(defaultTours));
-    }
-    if (!localStorage.getItem(APTS_KEY)) {
-      localStorage.setItem(APTS_KEY, JSON.stringify(defaultApartments));
-    }
-  } catch (e) {
-    console.warn('LocalStorage error:', e);
-  }
+const TOKEN_KEY = 'admin_token';
+let catalogPromise = null;
+let freshCatalog = null; // copia más reciente conocida tras un guardado del admin
+
+const fallback = () => ({ tours: defaultTours, apartments: defaultApartments, storage: 'offline' });
+
+function authHeaders() {
+  const token = localStorage.getItem(TOKEN_KEY);
+  return token ? { Authorization: `Bearer ${token}` } : {};
 }
 
-initStorage();
+async function apiError(res) {
+  let message = `Error ${res.status}`;
+  try {
+    const data = await res.json();
+    if (data?.error) message = data.error;
+  } catch { /* respuesta sin JSON */ }
+  if (res.status === 401) {
+    localStorage.removeItem(TOKEN_KEY);
+    window.dispatchEvent(new Event('admin-logout'));
+  }
+  return new Error(message);
+}
+
+async function loadCatalog({ fresh = false } = {}) {
+  if (freshCatalog) return freshCatalog;
+  if (!fresh && catalogPromise) return catalogPromise;
+  const request = fetch(`/api/catalog${fresh ? '?fresh=1' : ''}`)
+    .then((res) => (res.ok ? res.json() : Promise.reject(new Error(res.status))))
+    .then((data) => (Array.isArray(data?.tours) ? data : fallback()))
+    .catch(() => fallback());
+  catalogPromise = request;
+  return request;
+}
+
+async function saveCatalog(next) {
+  const res = await fetch('/api/catalog', {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...authHeaders() },
+    body: JSON.stringify({ tours: next.tours, apartments: next.apartments }),
+  });
+  if (!res.ok) throw await apiError(res);
+  freshCatalog = await res.json();
+  catalogPromise = Promise.resolve(freshCatalog);
+  return freshCatalog;
+}
+
+function upsert(list, item) {
+  const isNew = !item.id || item.id === 'new';
+  if (isNew) return [...list, { ...item, id: String(Date.now()) }];
+  return list.map((x) => (String(x.id) === String(item.id) ? { ...x, ...item } : x));
+}
+
+// Reduce la foto (máx. 1600 px, JPEG) antes de subirla: carga más rápido y
+// cabe en el límite de tamaño del servidor.
+function compressImage(file, maxSize = 1600, quality = 0.82) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    const url = URL.createObjectURL(file);
+    img.onload = () => {
+      const scale = Math.min(1, maxSize / Math.max(img.width, img.height));
+      const canvas = document.createElement('canvas');
+      canvas.width = Math.round(img.width * scale);
+      canvas.height = Math.round(img.height * scale);
+      canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+      URL.revokeObjectURL(url);
+      resolve(canvas.toDataURL('image/jpeg', quality));
+    };
+    img.onerror = () => {
+      URL.revokeObjectURL(url);
+      reject(new Error(`No se pudo leer la imagen "${file.name}". Usa JPG o PNG.`));
+    };
+    img.src = url;
+  });
+}
 
 export const store = {
-  // TOURS
-  async getTours() {
-    try {
-      const res = await fetch('/api/tours');
-      if (res.ok) {
-        const data = await res.json();
-        if (Array.isArray(data) && data.length > 0) return data;
-      }
-    } catch (e) {
-      // Fallback
-    }
-    try {
-      const local = localStorage.getItem(TOURS_KEY);
-      if (local) return JSON.parse(local);
-    } catch (e) {}
-    return defaultTours;
+  // ---------- Lectura (web pública y panel) ----------
+  async getTours({ fresh = false } = {}) {
+    return (await loadCatalog({ fresh })).tours;
   },
-
   async getTourById(id) {
-    try {
-      const res = await fetch(`/api/tours/${id}`);
-      if (res.ok) return await res.json();
-    } catch (e) {}
-    const tours = await this.getTours();
-    const found = tours.find(t => String(t.id) === String(id));
-    if (found) return found;
-    return defaultTours.find(t => String(t.id) === String(id)) || null;
+    const { tours } = await loadCatalog();
+    return tours.find((t) => String(t.id) === String(id)) || null;
   },
-
-  async saveTour(tourData) {
-    // Attempt backend save
-    let backendSaved = false;
-    try {
-      const isNew = !tourData.id || tourData.id === 'new';
-      const url = isNew ? '/api/tours' : `/api/tours/${tourData.id}`;
-      const method = isNew ? 'POST' : 'PUT';
-      const token = localStorage.getItem('admin_token');
-      const res = await fetch(url, {
-        method,
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify(tourData)
-      });
-      if (res.ok) backendSaved = true;
-    } catch (e) {}
-
-    // Save in LocalStorage
-    const tours = await this.getTours();
-    let updated;
-    if (!tourData.id || tourData.id === 'new') {
-      const newId = String(Date.now());
-      updated = [...tours, { ...tourData, id: newId }];
-    } else {
-      updated = tours.map(t => String(t.id) === String(tourData.id) ? { ...t, ...tourData } : t);
-    }
-    localStorage.setItem(TOURS_KEY, JSON.stringify(updated));
-    return { success: true, backendSaved };
+  async getApartments({ fresh = false } = {}) {
+    return (await loadCatalog({ fresh })).apartments;
   },
-
-  async deleteTour(id) {
-    try {
-      const token = localStorage.getItem('admin_token');
-      await fetch(`/api/tours/${id}`, {
-        method: 'DELETE',
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-    } catch (e) {}
-    const tours = await this.getTours();
-    const updated = tours.filter(t => String(t.id) !== String(id));
-    localStorage.setItem(TOURS_KEY, JSON.stringify(updated));
-    return { success: true };
-  },
-
-  // APARTMENTS
-  async getApartments() {
-    try {
-      const res = await fetch('/api/apartments');
-      if (res.ok) {
-        const data = await res.json();
-        if (Array.isArray(data) && data.length > 0) return data;
-      }
-    } catch (e) {}
-    try {
-      const local = localStorage.getItem(APTS_KEY);
-      if (local) return JSON.parse(local);
-    } catch (e) {}
-    return defaultApartments;
-  },
-
   async getApartmentById(id) {
-    try {
-      const res = await fetch(`/api/apartments/${id}`);
-      if (res.ok) return await res.json();
-    } catch (e) {}
-    const apts = await this.getApartments();
-    const found = apts.find(a => String(a.id) === String(id));
-    if (found) return found;
-    return defaultApartments.find(a => String(a.id) === String(id)) || null;
+    const { apartments } = await loadCatalog();
+    return apartments.find((a) => String(a.id) === String(id)) || null;
+  },
+  async getStorageStatus() {
+    return (await loadCatalog({ fresh: true })).storage;
   },
 
-  async saveApartment(aptData) {
-    let backendSaved = false;
-    try {
-      const isNew = !aptData.id || aptData.id === 'new';
-      const url = isNew ? '/api/apartments' : `/api/apartments/${aptData.id}`;
-      const method = isNew ? 'POST' : 'PUT';
-      const token = localStorage.getItem('admin_token');
-      const res = await fetch(url, {
-        method,
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify(aptData)
-      });
-      if (res.ok) backendSaved = true;
-    } catch (e) {}
-
-    const apts = await this.getApartments();
-    let updated;
-    if (!aptData.id || aptData.id === 'new') {
-      const newId = String(Date.now());
-      updated = [...apts, { ...aptData, id: newId }];
-    } else {
-      updated = apts.map(a => String(a.id) === String(aptData.id) ? { ...a, ...aptData } : a);
-    }
-    localStorage.setItem(APTS_KEY, JSON.stringify(updated));
-    return { success: true, backendSaved };
-  },
-
-  async deleteApartment(id) {
-    try {
-      const token = localStorage.getItem('admin_token');
-      await fetch(`/api/apartments/${id}`, {
-        method: 'DELETE',
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-    } catch (e) {}
-    const apts = await this.getApartments();
-    const updated = apts.filter(a => String(a.id) !== String(id));
-    localStorage.setItem(APTS_KEY, JSON.stringify(updated));
+  // ---------- Escritura (solo admin) ----------
+  async saveTour(tour) {
+    const current = await loadCatalog({ fresh: true });
+    await saveCatalog({ ...current, tours: upsert(current.tours, tour) });
     return { success: true };
   },
+  async deleteTour(id) {
+    const current = await loadCatalog({ fresh: true });
+    await saveCatalog({ ...current, tours: current.tours.filter((t) => String(t.id) !== String(id)) });
+    return { success: true };
+  },
+  async saveApartment(apt) {
+    const current = await loadCatalog({ fresh: true });
+    await saveCatalog({ ...current, apartments: upsert(current.apartments, apt) });
+    return { success: true };
+  },
+  async deleteApartment(id) {
+    const current = await loadCatalog({ fresh: true });
+    await saveCatalog({
+      ...current,
+      apartments: current.apartments.filter((a) => String(a.id) !== String(id)),
+    });
+    return { success: true };
+  },
+  async resetDefaults() {
+    await saveCatalog({ tours: defaultTours, apartments: defaultApartments });
+  },
 
-  resetDefaults() {
-    localStorage.setItem(TOURS_KEY, JSON.stringify(defaultTours));
-    localStorage.setItem(APTS_KEY, JSON.stringify(defaultApartments));
-  }
+  async uploadImage(file) {
+    const dataUrl = await compressImage(file);
+    const res = await fetch('/api/upload', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...authHeaders() },
+      body: JSON.stringify({ dataUrl }),
+    });
+    if (!res.ok) throw await apiError(res);
+    return (await res.json()).url;
+  },
+
+  // ---------- Sesión ----------
+  async login(username, password) {
+    const res = await fetch('/api/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username, password }),
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok || !data.token) throw new Error(data.error || 'No se pudo iniciar sesión.');
+    localStorage.setItem(TOKEN_KEY, data.token);
+    return true;
+  },
+  logout() {
+    localStorage.removeItem(TOKEN_KEY);
+    freshCatalog = null;
+  },
 };

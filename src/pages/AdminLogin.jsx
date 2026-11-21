@@ -1,72 +1,28 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Lock, ArrowLeft, HelpCircle } from 'lucide-react';
+import { store } from '../data/store';
 
 export default function AdminLogin({ onLogin }) {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [showRecovery, setShowRecovery] = useState(false);
-  const [recoveryAnswer, setRecoveryAnswer] = useState('');
-  const [newPassword, setNewPassword] = useState('');
-  const [recoverySuccess, setRecoverySuccess] = useState('');
+  const [submitting, setSubmitting] = useState(false);
   const navigate = useNavigate();
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
     setError('');
-
-    const u = username.trim();
-    const p = password.trim();
-
-    // Verificación de credenciales oficiales del sistema
-    const valid = 
-      (u.toUpperCase() === 'ADMIN' && (p === 'admin1234' || p === 'admin123')) ||
-      (u.toLowerCase() === 'admin' && (p === 'admin1234' || p === 'admin123'));
-
-    if (valid) {
-      localStorage.setItem('admin_token', 'youtours-admin-session-active');
+    setSubmitting(true);
+    try {
+      await store.login(username.trim(), password);
       onLogin(true);
       navigate('/admin');
-      return;
-    }
-
-    // Intentar backend si estuviera online
-    fetch('/api/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ username: u, password: p })
-    })
-      .then(res => res.json())
-      .then(data => {
-        if (data.success) {
-          localStorage.setItem('admin_token', data.token);
-          onLogin(true);
-          navigate('/admin');
-        } else {
-          setError('Usuario o contraseña incorrectos.');
-        }
-      })
-      .catch(() => {
-        setError('Usuario o contraseña incorrectos.');
-      });
-  };
-
-  const handleRecovery = (e) => {
-    e.preventDefault();
-    if (recoveryAnswer.trim() === '2022') {
-      if (newPassword.length < 4) {
-        setError('La nueva contraseña debe tener al menos 4 caracteres.');
-        return;
-      }
-      localStorage.setItem('admin_token', 'youtours-admin-session-active');
-      setRecoverySuccess('¡Identidad verificada! Contraseña restablecida.');
-      setTimeout(() => {
-        onLogin(true);
-        navigate('/admin');
-      }, 1500);
-    } else {
-      setError('Respuesta de seguridad incorrecta.');
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -120,21 +76,6 @@ export default function AdminLogin({ onLogin }) {
             textAlign: 'center'
           }}>
             {error}
-          </div>
-        )}
-
-        {recoverySuccess && (
-          <div style={{
-            backgroundColor: 'rgba(16, 185, 129, 0.1)',
-            border: '1px solid #10b981',
-            color: '#10b981',
-            padding: '0.8rem',
-            borderRadius: 'var(--radius-md)',
-            fontSize: '0.85rem',
-            marginBottom: '1.5rem',
-            textAlign: 'center'
-          }}>
-            {recoverySuccess}
           </div>
         )}
 
@@ -199,85 +140,33 @@ export default function AdminLogin({ onLogin }) {
             <button 
               type="submit"
               className="btn btn-primary"
+              disabled={submitting}
               style={{ width: '100%', padding: '0.85rem', fontSize: '1rem', fontWeight: 700, marginTop: '0.5rem' }}
             >
-              Ingresar al Panel
+              {submitting ? 'Verificando…' : 'Ingresar al Panel'}
             </button>
           </form>
         ) : (
-          <form onSubmit={handleRecovery} style={{ display: 'flex', flexDirection: 'column', gap: '1.2rem' }}>
-            <div style={{ padding: '0.8rem', backgroundColor: 'var(--background)', borderRadius: 'var(--radius-md)', border: '1px solid var(--border)' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--primary)', fontWeight: 700, fontSize: '0.85rem', marginBottom: '0.25rem' }}>
-                <HelpCircle size={16} /> Pregunta de Seguridad
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', fontSize: '0.9rem', lineHeight: 1.6 }}>
+            <div style={{ padding: '1rem', backgroundColor: 'var(--background)', borderRadius: 'var(--radius-md)', border: '1px solid var(--border)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--primary)', fontWeight: 700, marginBottom: '0.5rem' }}>
+                <HelpCircle size={16} /> ¿Olvidaste la contraseña?
               </div>
-              <p style={{ fontSize: '0.9rem', color: 'var(--text-main)', fontWeight: 600 }}>
-                ¿En qué año te graduaste del colegio?
-              </p>
+              <ol style={{ paddingLeft: '1.2rem', color: 'var(--text-main)' }}>
+                <li>Entra a vercel.com → proyecto <b>youtourscartagena</b>.</li>
+                <li>Ve a <b>Settings → Environment Variables</b>.</li>
+                <li>Edita <b>ADMIN_PASSWORD</b> con tu nueva contraseña y guarda.</li>
+                <li>En <b>Deployments</b>, pulsa <b>Redeploy</b> en el último despliegue.</li>
+              </ol>
             </div>
-
-            <div>
-              <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, marginBottom: '0.4rem' }}>
-                Tu Respuesta
-              </label>
-              <input 
-                type="text"
-                value={recoveryAnswer}
-                onChange={(e) => setRecoveryAnswer(e.target.value)}
-                placeholder="Escribe la respuesta"
-                required
-                autoFocus
-                style={{
-                  width: '100%',
-                  padding: '0.8rem 1rem',
-                  borderRadius: 'var(--radius-md)',
-                  border: '1px solid var(--border)',
-                  backgroundColor: 'var(--background)',
-                  color: 'var(--text-main)',
-                  fontSize: '1rem',
-                  outline: 'none'
-                }}
-              />
-            </div>
-
-            <div>
-              <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, marginBottom: '0.4rem' }}>
-                Nueva Contraseña
-              </label>
-              <input 
-                type="password"
-                value={newPassword}
-                onChange={(e) => setNewPassword(e.target.value)}
-                placeholder="••••••••"
-                required
-                style={{
-                  width: '100%',
-                  padding: '0.8rem 1rem',
-                  borderRadius: 'var(--radius-md)',
-                  border: '1px solid var(--border)',
-                  backgroundColor: 'var(--background)',
-                  color: 'var(--text-main)',
-                  fontSize: '1rem',
-                  outline: 'none'
-                }}
-              />
-            </div>
-
-            <button 
-              type="submit"
-              className="btn btn-primary"
-              style={{ width: '100%', padding: '0.85rem', fontSize: '1rem', fontWeight: 700 }}
-            >
-              Restablecer y Entrar
-            </button>
-
-            <button 
+            <button
               type="button"
               onClick={() => { setShowRecovery(false); setError(''); }}
               style={{ background: 'none', border: 'none', color: 'var(--text-muted)', fontSize: '0.85rem', cursor: 'pointer', textAlign: 'center' }}
             >
               ← Volver al login
             </button>
-          </form>
+          </div>
         )}
 
         <div style={{ textAlign: 'center', marginTop: '2rem' }}>
