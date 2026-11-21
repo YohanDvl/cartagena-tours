@@ -110,7 +110,7 @@ export default function Home() {
 
   return (
     <div>
-      <Seo path="/" description="Tours en Cartagena de Indias: Islas del Rosario, botes privados, Chiva Rumbera, Ciudad Amurallada y apartamentos turísticos. Reserva directa por WhatsApp con YouTours." />
+      <Seo path="/" description="Tours y pasadías en Cartagena de Indias: Islas del Rosario, beach clubs como Bora Bora, Pao Pao, Capri y Sabai, city tour y apartamentos turísticos. Reserva directa por WhatsApp con YouTours." />
       {/* Hero Section */}
       <section id="home" style={{
         position: 'relative',
@@ -343,8 +343,8 @@ export default function Home() {
                 {[
                   { label: '🏢 Apartamentos', term: 'apartamentos', target: 'apartments' },
                   { label: '🏝️ Islas del Rosario', term: 'islas', target: 'tours' },
-                  { label: '⛵ Catamarán & Botes', term: 'catamarán', target: 'tours' },
-                  { label: '🎉 Chiva Rumbera', term: 'chiva', target: 'tours' },
+                  { label: '🏖️ Beach Clubs', term: 'beach', target: 'tours' },
+                  { label: '🏛️ City Tour', term: 'city', target: 'tours' },
                 ].map((chip) => (
                   <button
                     key={chip.term}
@@ -440,7 +440,7 @@ export default function Home() {
             <span className="badge badge-accent" style={{ marginBottom: '0.5rem', display: 'inline-block' }}>EXPERIENCIAS</span>
             <h2 style={{ fontSize: '2.5rem', color: 'var(--text-main)' }}>Tours & Excursiones en Cartagena</h2>
             <p style={{ color: 'var(--text-muted)', maxWidth: '600px', margin: '0.5rem auto 0 auto' }}>
-              Navega a las Islas del Rosario, recorre la historia colonial o disfruta de la fiesta tradicional sobre ruedas.
+              Pasadías en los mejores beach clubs de Cartagena e Islas del Rosario, y un city tour para conocer la ciudad.
             </p>
           </div>
 
@@ -563,6 +563,8 @@ export default function Home() {
           <div style={{ position: 'relative' }}>
             <img 
               src={getImageUrl('/images/cartagena_generic_1.png')} 
+              loading="lazy"
+              decoding="async"
               alt="Cartagena de Indias Bahía" 
               style={{ width: '100%', height: '420px', objectFit: 'cover', borderRadius: 'var(--radius-xl)', boxShadow: 'var(--shadow-xl)' }}
             />

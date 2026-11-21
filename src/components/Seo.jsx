@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 
 export const SITE_URL = 'https://youtourscartagena.vercel.app';
-const DEFAULT_TITLE = 'YouTours Cartagena | Tours, Islas del Rosario & Botes Privados en Cartagena';
+const DEFAULT_TITLE = 'YouTours Cartagena | Tours, Pasadías e Islas del Rosario';
 
 function setMeta(selector, attr, key, value) {
   let el = document.head.querySelector(selector);

@@ -46,6 +46,8 @@ export default function TourCard({ tour }) {
           <img 
             key={idx}
             src={getImageUrl(img)} 
+            loading="lazy"
+            decoding="async"
             alt={`${tour.title} ${idx + 1}`} 
             style={{ 
               position: 'absolute',

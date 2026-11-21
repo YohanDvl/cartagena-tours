@@ -80,6 +80,8 @@ export default function ApartmentDetails() {
           <img 
             key={idx}
             src={getImageUrl(img)} 
+            loading={idx === 0 ? 'eager' : 'lazy'}
+            decoding="async"
             alt={`${apartment.title} ${idx + 1}`} 
             style={{ 
               position: 'absolute',

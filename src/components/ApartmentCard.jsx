@@ -46,6 +46,8 @@ export default function ApartmentCard({ apartment }) {
           <img 
             key={idx}
             src={getImageUrl(img)} 
+            loading="lazy"
+            decoding="async"
             alt={`${apartment.title} ${idx + 1}`} 
             style={{ 
               position: 'absolute',

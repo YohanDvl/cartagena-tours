@@ -79,6 +79,8 @@ export default function TourDetails() {
           <img 
             key={idx}
             src={getImageUrl(img)} 
+            loading={idx === 0 ? 'eager' : 'lazy'}
+            decoding="async"
             alt={`${tour.title} ${idx + 1}`} 
             style={{ 
               position: 'absolute',
