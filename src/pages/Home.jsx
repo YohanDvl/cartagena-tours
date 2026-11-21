@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Search, Compass, Shield, ThumbsUp, Building, X, ArrowDown } from 'lucide-react';
 import TourCard from '../components/TourCard';
 import ApartmentCard from '../components/ApartmentCard';
-import { store } from '../data/store';
+import { store, getInstantCatalog } from '../data/store';
 import Seo from '../components/Seo';
 import { getImageUrl } from '../utils/imageUrl';
 
@@ -13,6 +13,16 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    // Con conexiones lentas, a los 1,5 s se muestra la copia local del catálogo
+    // y se reemplaza cuando llega la versión del servidor.
+    let done = false;
+    const slow = setTimeout(() => {
+      if (done) return;
+      const instant = getInstantCatalog();
+      setTours(instant.tours);
+      setApartments(instant.apartments);
+      setLoading(false);
+    }, 1500);
     async function loadData() {
       try {
         const [toursData, aptsData] = await Promise.all([
@@ -24,10 +34,13 @@ export default function Home() {
       } catch (err) {
         console.error('Error cargando catálogo:', err);
       } finally {
+        done = true;
+        clearTimeout(slow);
         setLoading(false);
       }
     }
     loadData();
+    return () => clearTimeout(slow);
   }, []);
 
   useEffect(() => {

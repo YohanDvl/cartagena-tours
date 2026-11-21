@@ -4,6 +4,7 @@ import { defaultTours, defaultApartments } from './defaultData';
 // visitantes. Este módulo lo lee y, en el panel admin, lo guarda.
 
 const TOKEN_KEY = 'admin_token';
+const CACHE_KEY = 'yt_catalog_cache';
 let catalogPromise = null;
 let freshCatalog = null; // copia más reciente conocida tras un guardado del admin
 
@@ -32,7 +33,11 @@ async function loadCatalog({ fresh = false } = {}) {
   if (!fresh && catalogPromise) return catalogPromise;
   const request = fetch(`/api/catalog${fresh ? '?fresh=1' : ''}`)
     .then((res) => (res.ok ? res.json() : Promise.reject(new Error(res.status))))
-    .then((data) => (Array.isArray(data?.tours) ? data : fallback()))
+    .then((data) => {
+      if (!Array.isArray(data?.tours)) return fallback();
+      try { localStorage.setItem(CACHE_KEY, JSON.stringify(data)); } catch { /* sin almacenamiento */ }
+      return data;
+    })
     .catch(() => fallback());
   catalogPromise = request;
   return request;
@@ -77,6 +82,15 @@ function compressImage(file, maxSize = 1600, quality = 0.82) {
     };
     img.src = url;
   });
+}
+
+/** Catálogo disponible al instante: la última copia vista en este navegador o los datos incluidos en la web. */
+export function getInstantCatalog() {
+  try {
+    const cached = JSON.parse(localStorage.getItem(CACHE_KEY));
+    if (Array.isArray(cached?.tours)) return cached;
+  } catch { /* sin copia */ }
+  return fallback();
 }
 
 export const store = {
