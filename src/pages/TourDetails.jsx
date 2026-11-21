@@ -47,6 +47,7 @@ export default function TourDetails() {
   if (!tour) {
     return (
       <div style={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: '1rem' }}>
+        <Seo title="Tour no encontrado" path="/" noindex />
         <h2>Tour no encontrado</h2>
         <Link to="/" className="btn btn-primary">Volver al Inicio</Link>
       </div>

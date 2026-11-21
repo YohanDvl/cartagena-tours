@@ -47,6 +47,7 @@ export default function ApartmentDetails() {
   if (!apartment) {
     return (
       <div style={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: '1rem' }}>
+        <Seo title="Apartamento no encontrado" path="/" noindex />
         <h2>Apartamento no encontrado</h2>
         <Link to="/" className="btn btn-primary">Volver al Inicio</Link>
       </div>
