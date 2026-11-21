@@ -114,10 +114,12 @@ export default function ApartmentCard({ apartment }) {
           <h3 style={{ fontSize: '1.25rem', marginBottom: 0 }}>{apartment.title}</h3>
         </div>
         
+        {Number(apartment.reviews) > 0 && (
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', color: 'var(--accent-gold)', marginBottom: '0.5rem', fontSize: '0.9rem', fontWeight: 600 }}>
           <Star size={16} fill="currentColor" /> {apartment.rating || 5.0}
-          <span style={{ color: 'var(--text-light)', fontWeight: 400, marginLeft: '0.3rem' }}>({apartment.reviews || 40} reseñas)</span>
+          <span style={{ color: 'var(--text-light)', fontWeight: 400, marginLeft: '0.3rem' }}>({apartment.reviews} reseñas)</span>
         </div>
+        )}
         
         <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '1rem', flex: 1, lineHeight: 1.5 }}>
           {apartment.shortDescription}

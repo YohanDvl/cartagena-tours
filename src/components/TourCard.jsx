@@ -123,10 +123,12 @@ export default function TourCard({ tour }) {
           <h3 style={{ fontSize: '1.25rem', marginBottom: 0 }}>{tour.title}</h3>
         </div>
         
+        {Number(tour.reviews) > 0 && (
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', color: 'var(--accent-gold)', marginBottom: '0.5rem', fontSize: '0.9rem', fontWeight: 600 }}>
           <Star size={16} fill="currentColor" /> {tour.rating || 5.0}
-          <span style={{ color: 'var(--text-light)', fontWeight: 400, marginLeft: '0.3rem' }}>({tour.reviews || 95} reseñas)</span>
+          <span style={{ color: 'var(--text-light)', fontWeight: 400, marginLeft: '0.3rem' }}>({tour.reviews} reseñas)</span>
         </div>
+        )}
         
         <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '1rem', flex: 1, lineHeight: 1.5 }}>
           {tour.shortDescription}

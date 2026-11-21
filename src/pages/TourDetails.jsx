@@ -125,10 +125,12 @@ export default function TourDetails() {
           <h1 style={{ color: 'white', fontSize: 'clamp(2rem, 4vw, 3.5rem)', marginBottom: '0.5rem', textShadow: '0 2px 10px rgba(0,0,0,0.6)' }}>
             {tour.title}
           </h1>
+        {Number(tour.reviews) > 0 && (
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--accent-gold)', marginBottom: '1.5rem', fontSize: '1.1rem', fontWeight: 600 }}>
             <Star size={20} fill="currentColor" /> {tour.rating || 5.0}
-            <span style={{ color: 'rgba(255,255,255,0.85)', fontWeight: 400, marginLeft: '0.5rem' }}>({tour.reviews || 95} valoraciones verificadas)</span>
+            <span style={{ color: 'rgba(255,255,255,0.85)', fontWeight: 400, marginLeft: '0.5rem' }}>({tour.reviews} valoraciones verificadas)</span>
           </div>
+        )}
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1.5rem', color: 'rgba(255,255,255,0.95)', fontSize: '1.1rem' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
               <Clock size={20} color="var(--primary)" />

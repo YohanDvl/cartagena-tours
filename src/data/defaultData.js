@@ -1,4 +1,7 @@
-export const defaultTours = [
+import { catalogTours } from './catalogTours.js';
+
+// Tours de ejemplo originales (van después de los tours reales del catálogo).
+const demoTours = [
   {
     id: "1",
     title: "Día de Lujo en Islas del Rosario",
@@ -326,6 +329,8 @@ export const defaultTours = [
   }
 ];
 
+export const defaultTours = [...catalogTours, ...demoTours];
+
 export const defaultApartments = [
   {
     id: "1",
@@ -340,7 +345,6 @@ export const defaultApartments = [
     isBestSeller: true,
     images: [
       "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&q=80&w=1000",
-      "https://images.unsplash.com/photo-1502672260266-1c1de2d9d00c?auto=format&fit=crop&q=80&w=1000",
       "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&fit=crop&q=80&w=1000"
     ],
     category: "Lujo & Playa",
@@ -413,7 +417,6 @@ export const defaultApartments = [
     images: [
       "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&fit=crop&q=80&w=1000",
       "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&q=80&w=1000",
-      "https://images.unsplash.com/photo-1502672260266-1c1de2d9d00c?auto=format&fit=crop&q=80&w=1000"
     ],
     category: "Familiar & Playa",
     includes: [
