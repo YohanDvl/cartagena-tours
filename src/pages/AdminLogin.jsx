@@ -21,8 +21,8 @@ export default function AdminLogin({ onLogin }) {
 
     // Verificación de credenciales oficiales del sistema
     const valid = 
-      (u.toUpperCase() === 'ADMIN' && (p === 'admin1234' || p === 'admin123')) ||
-      (u.toLowerCase() === 'admin' && (p === 'admin1234' || p === 'admin123'));
+      (u.toUpperCase() === 'ADMIN' && (p === 'CLAVE_ELIMINADA' || p === 'CLAVE_ELIMINADA')) ||
+      (u.toLowerCase() === 'admin' && (p === 'CLAVE_ELIMINADA' || p === 'CLAVE_ELIMINADA'));
 
     if (valid) {
       localStorage.setItem('admin_token', 'youtours-admin-session-active');
