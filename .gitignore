@@ -25,3 +25,7 @@ dist-ssr
 
 .vercel
 .env*
+
+# Bases de datos locales: nunca se suben
+*.db
+*.sqlite
